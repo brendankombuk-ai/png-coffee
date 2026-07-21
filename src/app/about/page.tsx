@@ -1,0 +1,48 @@
+import type { Metadata } from "next";
+import Navbar from "@/components/Navbar";
+import StoryIntro from "@/components/StoryIntro";
+import ExploreBanner from "@/components/ExploreBanner";
+import MissionSection from "@/components/MissionSection";
+import ValueGrid from "@/components/ValueGrid";
+import Footer from "@/components/Footer";
+import { site } from "@/data/content";
+import {
+  getStoryIntro,
+  getExploreLinks,
+  getMissionSection,
+  getValueCards,
+} from "@/lib/cms/adapters";
+
+export const metadata: Metadata = {
+  title: "About Us",
+  description:
+    "PNG Coffee's story, mission, and the roastery, training and equipment services behind every cup — PNG grown, shared with the world.",
+  openGraph: {
+    title: `About Us – ${site.name}`,
+    description:
+      "PNG Coffee's story, mission, and the roastery, training and equipment services behind every cup.",
+    images: [{ url: "/images/png.jpg", width: 1600, height: 1465 }],
+  },
+};
+
+export default async function AboutPage() {
+  const [storyIntro, exploreLinks, missionSection, valueCards] = await Promise.all([
+    getStoryIntro(),
+    getExploreLinks(),
+    getMissionSection(),
+    getValueCards(),
+  ]);
+
+  return (
+    <>
+      <Navbar />
+      <main id="main-content" className="relative bg-void-950">
+        <StoryIntro storyIntro={storyIntro} />
+        <ExploreBanner exploreLinks={exploreLinks} />
+        <MissionSection missionSection={missionSection} />
+        <ValueGrid valueCards={valueCards} />
+      </main>
+      <Footer />
+    </>
+  );
+}
