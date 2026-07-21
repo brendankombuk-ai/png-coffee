@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import "@/styles/globals.css";
 import SmoothScrollProvider from "@/components/SmoothScrollProvider";
 import { site } from "@/data/content";
+import { Analytics } from "@vercel/analytics/next";
 
 const archivo = { variable: "--font-display" };
 const inter = { variable: "--font-body" };
@@ -59,6 +60,7 @@ export default function RootLayout({
           Skip to main content
         </a>
         <SmoothScrollProvider>{children}</SmoothScrollProvider>
+        <Analytics />
       </body>
     </html>
   );
