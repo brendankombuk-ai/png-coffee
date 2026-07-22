@@ -5,7 +5,8 @@ import Navbar from "./Navbar";
 import AnimatedBackground from "./AnimatedBackground";
 import ProductGrid from "./ProductGrid";
 import Footer from "./Footer";
-import type { ProductCategoryPageData } from "@/data/content";
+import JsonLd from "./JsonLd";
+import { site, type ProductCategoryPageData } from "@/data/content";
 
 /**
  * Shared template for every /products/[slug] page. Takes title, description
@@ -19,8 +20,45 @@ export default function ProductCategoryPage({
   products,
   background,
 }: ProductCategoryPageData) {
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: site.url },
+      { "@type": "ListItem", position: 2, name: "Our Coffee", item: `${site.url}/products` },
+      { "@type": "ListItem", position: 3, name: title, item: `${site.url}/products/${slug}` },
+    ],
+  };
+
+  const pricedProducts = products.filter((p) => p.price > 0);
+  const productListSchema = pricedProducts.length
+    ? {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        itemListElement: pricedProducts.map((product, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          item: {
+            "@type": "Product",
+            name: product.name,
+            description: product.description,
+            ...(product.image ? { image: `${site.url}${product.image}` } : {}),
+            offers: {
+              "@type": "Offer",
+              price: product.price.toFixed(2),
+              priceCurrency: process.env.NEXT_PUBLIC_CURRENCY || "USD",
+              availability: "https://schema.org/InStock",
+              url: `${site.url}/products/${slug}`,
+            },
+          },
+        })),
+      }
+    : null;
+
   return (
     <>
+      <JsonLd data={breadcrumbSchema} />
+      {productListSchema && <JsonLd data={productListSchema} />}
       <Navbar />
       <AnimatedBackground {...(background ? { src: background } : {})} />
       <main id="main-content" className="relative">

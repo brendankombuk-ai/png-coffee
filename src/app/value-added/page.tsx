@@ -8,9 +8,13 @@ import { site, productsValueAdded } from "@/data/content";
 export const metadata: Metadata = {
   title: "Value Added",
   description: productsValueAdded.intro,
+  alternates: {
+    canonical: "/value-added",
+  },
   openGraph: {
     title: `Value Added – ${site.name}`,
     description: productsValueAdded.intro,
+    url: "/value-added",
     images: [
       {
         url: "/images/about-values/value-added.jpg",

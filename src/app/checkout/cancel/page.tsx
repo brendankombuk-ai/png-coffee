@@ -3,7 +3,10 @@ import { XCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-export const metadata = { title: "Checkout Cancelled" };
+export const metadata = {
+  title: "Checkout Cancelled",
+  robots: { index: false, follow: false },
+};
 
 export default function CheckoutCancelPage() {
   return (

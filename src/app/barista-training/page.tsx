@@ -10,9 +10,13 @@ export const metadata: Metadata = {
   title: "Barista Training",
   description:
     "PNG Coffee's baristas are trained and qualified in Australia, plus short courses for aspiring baristas passionate about mastering the art of coffee-making.",
+  alternates: {
+    canonical: "/barista-training",
+  },
   openGraph: {
     title: `Barista Training – ${site.name}`,
     description: "World-class barista training, qualified in Australia, brought home to PNG.",
+    url: "/barista-training",
     images: [
       { url: baristaTrainingImage.src, width: 1600, height: 900, alt: baristaTrainingImage.alt },
     ],

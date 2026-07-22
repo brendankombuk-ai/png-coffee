@@ -11,10 +11,14 @@ export const metadata: Metadata = {
   title: "Papua New Guinea",
   description:
     "Discover Papua New Guinea — breathtaking landscapes, over 800 languages, the Kokoda Track, Mount Wilhelm, coral reefs, and birds of paradise.",
+  alternates: {
+    canonical: "/png",
+  },
   openGraph: {
     title: `Papua New Guinea – ${site.name}`,
     description:
       "Discover Papua New Guinea — breathtaking landscapes, cultural diversity, the Kokoda Track, Mount Wilhelm, coral reefs, and birds of paradise.",
+    url: "/png",
   },
 };
 

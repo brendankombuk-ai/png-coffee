@@ -73,6 +73,14 @@ export const site = {
   description:
     "PNG Coffee roasts and packs high-quality, small-batch coffee grown in the highlands of Papua New Guinea \u2014 PNG grown, shared with the world.",
   location: "Papua New Guinea",
+  url: "https://www.pngcoffee.com",
+};
+
+/** Structured postal address for the roastery, used in LocalBusiness JSON-LD. */
+export const businessAddress = {
+  streetAddress: "Gabaka Street",
+  addressLocality: "Gordon, Port Moresby",
+  addressCountry: "PG",
 };
 
 /* ---------------------------- About page content ---------------------------- */

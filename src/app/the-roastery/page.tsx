@@ -11,10 +11,14 @@ export const metadata: Metadata = {
   title: "The Roastery",
   description:
     "Inside PNG Coffee's state-of-the-art roastery at Gabaka Street, Gordon, Port Moresby — custom blends, micro-lots, and a showroom of professional coffee equipment.",
+  alternates: {
+    canonical: "/the-roastery",
+  },
   openGraph: {
     title: `The Roastery – ${site.name}`,
     description:
       "Inside PNG Coffee's state-of-the-art roastery at Gabaka Street, Gordon, Port Moresby.",
+    url: "/the-roastery",
     images: [{ url: coffeeShowroom.image, width: 1600, height: 1200, alt: coffeeShowroom.alt }],
   },
   twitter: {

@@ -10,10 +10,14 @@ export const metadata: Metadata = {
   title: "Coffee Equipment Service",
   description:
     "Comprehensive servicing for all coffee equipment, carried out by qualified technicians — trusted by leading hotel groups across PNG.",
+  alternates: {
+    canonical: "/coffee-equipment-service",
+  },
   openGraph: {
     title: `Coffee Equipment Service – ${site.name}`,
     description:
       "Comprehensive servicing for all coffee equipment, carried out by qualified technicians.",
+    url: "/coffee-equipment-service",
     images: [
       {
         url: equipmentServiceImage.src,

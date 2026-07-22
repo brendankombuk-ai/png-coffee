@@ -17,10 +17,14 @@ export const metadata: Metadata = {
   title: "About Us",
   description:
     "PNG Coffee's story, mission, and the roastery, training and equipment services behind every cup — PNG grown, shared with the world.",
+  alternates: {
+    canonical: "/about",
+  },
   openGraph: {
     title: `About Us – ${site.name}`,
     description:
       "PNG Coffee's story, mission, and the roastery, training and equipment services behind every cup.",
+    url: "/about",
     images: [{ url: "/images/png.jpg", width: 1600, height: 1465 }],
   },
 };
