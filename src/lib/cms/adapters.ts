@@ -287,6 +287,7 @@ function mapCmsProductToPlaceholder(p: CmsProduct): ProductPlaceholder {
     id: p.slug,
     name: p.name,
     description: p.shortDescription ?? "",
+    price: p.salePrice ?? p.price ?? 0,
     image: mediaUrl(p.featuredImage?.url),
     alt: p.featuredImage?.alternativeText ?? p.name,
   };

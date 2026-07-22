@@ -144,6 +144,8 @@ export type ValueCard = {
   image: string;
   alt: string;
   accent: string;
+  /** Dedicated page this card links to (About page cards navigate via next/link). */
+  href?: string;
 };
 
 export const valueCards: ValueCard[] = [
@@ -156,6 +158,7 @@ export const valueCards: ValueCard[] = [
     image: "/images/about-values/value-added.jpg",
     alt: "Roasted coffee beans, ground coffee, and packaged value-added coffee products",
     accent: "from-ember-600 to-ember-800",
+    href: "/value-added",
   },
   {
     id: "roastery",
@@ -166,6 +169,7 @@ export const valueCards: ValueCard[] = [
     image: "/images/about-values/roastery.jpg",
     alt: "PNG Coffee's roasting machine at the Gabaka Street roastery",
     accent: "from-ember-500 to-void-900",
+    href: "/the-roastery",
   },
   {
     id: "barista-training",
@@ -176,6 +180,7 @@ export const valueCards: ValueCard[] = [
     image: "/images/about-values/barista-training.jpg",
     alt: "Barista tamping espresso grounds during a training session",
     accent: "from-ember-400 to-ember-600",
+    href: "/barista-training",
   },
   {
     id: "equipment-service",
@@ -186,6 +191,7 @@ export const valueCards: ValueCard[] = [
     image: "/images/about-values/equipment-service.jpg",
     alt: "Row of professional espresso machines and grinders being serviced",
     accent: "from-void-900 to-ember-900",
+    href: "/coffee-equipment-service",
   },
 ];
 
@@ -461,6 +467,65 @@ export const productsValueAdded = {
     "Our products cater to retail customers, restaurants, cafes, and export markets, ensuring that the world can enjoy the authentic taste of PNG coffee.",
 };
 
+/* ---------------------------- The Roastery page content ---------------------------- */
+
+export const roasteryHero = {
+  title: "The Roastery",
+  paragraphs: [
+    "Located at Gabaka Street, Gordon, Port Moresby, our state-of-the-art roastery allows us to provide fresher and higher-quality coffee to our corporate customers. Here, we craft custom blends and micro-lots of single-origin beans, ensuring a unique and personalised coffee experience.",
+  ],
+};
+
+export const coffeeShowroom = {
+  heading: "Coffee Showroom",
+  paragraphs: [
+    "Our roastery is showcased in a stunning glass cube, where visitors can witness the art of coffee roasting. The showroom features a complete range of coffee equipment for cafes and restaurants, including:",
+  ],
+  items: ["De-stoners", "Colour Sorters", "Tabletop Roasters", "Espresso Machines"],
+  outro:
+    "This space is designed to inspire and educate, offering a glimpse into the world of premium coffee production.",
+  image: "/images/about-values/roastery.jpg",
+  alt: "Industrial coffee roasting machine inside the PNG Coffee showroom",
+};
+
+export type EquipmentItem = { id: string; label: string; alt: string };
+
+export const roasteryEquipment: EquipmentItem[] = [
+  { id: "destoner", label: "De-stoner", alt: "Coffee bean de-stoner machine" },
+  { id: "colour-sorter", label: "Colour Sorter", alt: "Coffee colour sorting machine" },
+  { id: "tabletop-roaster", label: "Tabletop Roaster", alt: "Tabletop coffee roaster" },
+  { id: "espresso-machine", label: "Espresso Machine", alt: "Commercial espresso machine" },
+  { id: "packaging-sealer", label: "Packaging Sealer", alt: "Coffee bag packaging sealer" },
+];
+
+/* ---------------------------- Barista Training page content ---------------------------- */
+
+export const baristaTrainingHero = {
+  title: "Barista Training",
+  paragraphs: [
+    "Our baristas and personnel are trained and qualified in Australia, bringing world-class expertise to PNG. We also offer short courses for aspiring baristas who are passionate about mastering the art of coffee-making.",
+  ],
+};
+
+export const baristaTrainingImage = {
+  src: "/images/about-values/barista-training.jpg",
+  alt: "Barista tamping espresso grounds during a training session",
+};
+
+/* ---------------------------- Coffee Equipment Service page content ---------------------------- */
+
+export const equipmentServiceHero = {
+  title: "Coffee Equipment Service",
+  paragraphs: [
+    "We provide comprehensive servicing for all coffee equipment, carried out by qualified technicians. Our team is trusted by leading hotel groups, eliminating the need for overseas repair services and ensuring that your equipment operates at its best.",
+  ],
+};
+
+export const equipmentServiceImage = {
+  src: "/images/about-values/equipment-service.jpg",
+  alt: "Row of professional espresso machines and grinders being serviced",
+};
+
 /* ------------------------- Product category detail pages ------------------------- */
 /**
  * Placeholder product-catalog data for each category page (/products/[slug]).
@@ -473,6 +538,8 @@ export type ProductPlaceholder = {
   id: string;
   name: string;
   description: string;
+  /** Price in whole currency units (e.g. 14.99), not cents. See NEXT_PUBLIC_CURRENCY in .env. */
+  price: number;
   /** Optional real product photo (transparent PNG cutout). Falls back to a placeholder icon when absent. */
   image?: string;
   alt?: string;
@@ -492,6 +559,7 @@ function placeholderProducts(count = 6): ProductPlaceholder[] {
     id: `placeholder-${i + 1}`,
     name: "Product Name",
     description: "Product description goes here.",
+    price: 0,
   }));
 }
 
@@ -507,6 +575,7 @@ export const productCategoryPages: Record<string, ProductCategoryPageData> = {
         id: "medium-roast-whole-bean",
         name: "Medium Roast – Whole Bean",
         description: "Whole bean Arabica coffee, medium roast, 250g bag.",
+        price: 14.99,
         image: "/images/products/whole-beans/medium-roast-whole-bean.png",
         alt: "PNG Coffee Whole Bean 250g Medium Roast bag",
       },
@@ -514,6 +583,7 @@ export const productCategoryPages: Record<string, ProductCategoryPageData> = {
         id: "dark-roast-beans",
         name: "Dark Roast",
         description: "Rich, bold dark roast whole beans, 250g bag.",
+        price: 14.99,
         image: "/images/products/whole-beans/dark-roast-beans.png",
         alt: "PNG Coffee Dark Roast whole bean 250g bag",
       },
@@ -521,6 +591,7 @@ export const productCategoryPages: Record<string, ProductCategoryPageData> = {
         id: "medium-roast-beans",
         name: "Medium Roast",
         description: "Smooth, balanced medium roast whole beans, 250g bag.",
+        price: 14.99,
         image: "/images/products/whole-beans/medium-roast-beans.png",
         alt: "PNG Coffee Medium Roast whole bean 250g bag",
       },
@@ -529,6 +600,7 @@ export const productCategoryPages: Record<string, ProductCategoryPageData> = {
         name: "Arabica Coffee – Medium Roast",
         description:
           "Wild, naturally organic Arabica whole beans, medium roast, 250g bag.",
+        price: 16.99,
         image: "/images/products/whole-beans/arabica-medium-roast.png",
         alt: "PNG Coffee wild organic Arabica whole bean 250g bag, medium roast",
       },
@@ -544,6 +616,7 @@ export const productCategoryPages: Record<string, ProductCategoryPageData> = {
         id: "ground-medium-roast-blue",
         name: "Medium Roast",
         description: "Ground Arabica coffee, medium roast, 250g bag.",
+        price: 13.99,
         image: "/images/products/ground-coffee/ground-medium-roast-blue.png",
         alt: "PNG Coffee Ground Coffee 250g Medium Roast bag",
       },
@@ -551,6 +624,7 @@ export const productCategoryPages: Record<string, ProductCategoryPageData> = {
         id: "ground-dark-roast",
         name: "Dark Roast",
         description: "Rich, bold dark roast ground coffee, 250g bag.",
+        price: 13.99,
         image: "/images/products/ground-coffee/ground-dark-roast.png",
         alt: "PNG Coffee Dark Roast ground coffee 250g bag",
       },
@@ -558,6 +632,7 @@ export const productCategoryPages: Record<string, ProductCategoryPageData> = {
         id: "ground-medium-roast-green",
         name: "Papua New Guinea Ground Coffee",
         description: "Arabica ground coffee, medium roast, 250g bag.",
+        price: 13.99,
         image: "/images/products/ground-coffee/ground-medium-roast-green.png",
         alt: "PNG Coffee green bag Ground Coffee 250g Medium Roast",
       },
@@ -565,6 +640,7 @@ export const productCategoryPages: Record<string, ProductCategoryPageData> = {
         id: "ground-medium-roast-black",
         name: "Medium Roast",
         description: "Smooth, balanced medium roast ground coffee, 250g bag.",
+        price: 13.99,
         image: "/images/products/ground-coffee/ground-medium-roast-black.png",
         alt: "PNG Coffee Medium Roast ground coffee 250g bag",
       },
@@ -580,6 +656,7 @@ export const productCategoryPages: Record<string, ProductCategoryPageData> = {
         id: "drip-coffee-box",
         name: "Drip Coffee",
         description: "Single-serve drip filter bags, 12g x 10 bags per box.",
+        price: 9.99,
         image: "/images/products/drip-coffee/drip-coffee-box.png",
         alt: "PNG Coffee Drip Coffee box, 12g x 10 bags",
       },
@@ -596,6 +673,7 @@ export const productCategoryPages: Record<string, ProductCategoryPageData> = {
         name: "Arabica Medium Roast",
         description:
           "Arabica medium roast capsules for Nespresso machines, 10 capsules per box.",
+        price: 17.99,
         image: "/images/products/capsules/capsule-arabica-medium.png",
         alt: "PNG Coffee Arabica Medium Roast Nespresso-compatible capsules box",
       },
@@ -604,6 +682,7 @@ export const productCategoryPages: Record<string, ProductCategoryPageData> = {
         name: "Boka",
         description:
           "Boka capsules for Nespresso machines, 10 capsules per box.",
+        price: 19.99,
         image: "/images/products/capsules/capsule-boka.png",
         alt: "PNG Coffee Boka Nespresso-compatible capsules box",
       },
@@ -612,6 +691,7 @@ export const productCategoryPages: Record<string, ProductCategoryPageData> = {
         name: "Geisha",
         description:
           "Geisha capsules for Nespresso machines, 10 capsules per box.",
+        price: 21.99,
         image: "/images/products/capsules/capsule-geisha.png",
         alt: "PNG Coffee Geisha Nespresso-compatible capsules box",
       },
@@ -620,6 +700,7 @@ export const productCategoryPages: Record<string, ProductCategoryPageData> = {
         name: "Honey Processed",
         description:
           "Honey processed capsules for Nespresso machines, 10 capsules per box.",
+        price: 19.99,
         image: "/images/products/capsules/capsule-honey.png",
         alt: "PNG Coffee Honey Processed Nespresso-compatible capsules box",
       },
@@ -628,6 +709,7 @@ export const productCategoryPages: Record<string, ProductCategoryPageData> = {
         name: "Arabica Original",
         description:
           "Arabica original capsules for Nespresso machines, 10 capsules per box.",
+        price: 17.99,
         image: "/images/products/capsules/capsule-arabica-original.png",
         alt: "PNG Coffee Arabica Original Nespresso-compatible capsules box",
       },

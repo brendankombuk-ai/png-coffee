@@ -7,8 +7,10 @@ import type { ProductPlaceholder } from "@/data/content";
 
 export default function ProductGrid({
   products,
+  categorySlug,
 }: {
   products: ProductPlaceholder[];
+  categorySlug?: string;
 }) {
   return (
     <section className="relative z-10 mx-auto max-w-[1400px] px-6 pb-[100px] sm:px-10">
@@ -20,7 +22,7 @@ export default function ProductGrid({
         className="mx-auto grid max-w-6xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
       >
         {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard key={product.id} product={product} categorySlug={categorySlug} />
         ))}
       </motion.div>
     </section>

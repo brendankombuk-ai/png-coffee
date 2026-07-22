@@ -13,6 +13,7 @@ import type { ProductCategoryPageData } from "@/data/content";
  * a CMS, JSON file, or API response instead of the static data map.
  */
 export default function ProductCategoryPage({
+  slug,
   title,
   description,
   products,
@@ -43,7 +44,7 @@ export default function ProductCategoryPage({
         </section>
 
         {/* ============ PRODUCT GRID ============ */}
-        <ProductGrid products={products} />
+        <ProductGrid products={products} categorySlug={slug} />
       </main>
       <Footer />
     </>

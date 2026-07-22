@@ -5,10 +5,12 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Menu, Search, ShoppingBag, X } from "lucide-react";
 import { nav } from "@/data/content";
+import { useCart } from "@/lib/cart/CartContext";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const { itemCount, openCart } = useCart();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -63,10 +65,16 @@ export default function Navbar() {
               <Search size={18} strokeWidth={1.75} />
             </button>
             <button
-              aria-label="View cart"
-              className="text-white/85 transition-colors hover:text-ember-300"
+              aria-label={`View cart${itemCount > 0 ? ` (${itemCount} items)` : ""}`}
+              onClick={openCart}
+              className="relative text-white/85 transition-colors hover:text-ember-300"
             >
               <ShoppingBag size={18} strokeWidth={1.75} />
+              {itemCount > 0 && (
+                <span className="absolute -right-2 -top-2 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-ember-500 px-1 text-[10px] font-bold leading-none text-white">
+                  {itemCount > 99 ? "99+" : itemCount}
+                </span>
+              )}
             </button>
           </div>
 
@@ -102,8 +110,20 @@ export default function Navbar() {
               <button aria-label="Search products" className="text-white/85">
                 <Search size={18} strokeWidth={1.75} />
               </button>
-              <button aria-label="View cart" className="text-white/85">
+              <button
+                aria-label={`View cart${itemCount > 0 ? ` (${itemCount} items)` : ""}`}
+                onClick={() => {
+                  setOpen(false);
+                  openCart();
+                }}
+                className="relative text-white/85"
+              >
                 <ShoppingBag size={18} strokeWidth={1.75} />
+                {itemCount > 0 && (
+                  <span className="absolute -right-2 -top-2 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-ember-500 px-1 text-[10px] font-bold leading-none text-white">
+                    {itemCount > 99 ? "99+" : itemCount}
+                  </span>
+                )}
               </button>
             </li>
           </motion.ul>

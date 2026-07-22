@@ -1,11 +1,24 @@
 import type { Metadata } from "next";
-
+import { Archivo, Inter } from "next/font/google";
 import "@/styles/globals.css";
 import SmoothScrollProvider from "@/components/SmoothScrollProvider";
+import { CartProvider } from "@/lib/cart/CartContext";
+import CartDrawer from "@/components/CartDrawer";
 import { site } from "@/data/content";
 
-const archivo = { variable: "--font-display" };
-const inter = { variable: "--font-body" };
+const archivo = Archivo({
+  subsets: ["latin"],
+  weight: ["700", "800", "900"],
+  variable: "--font-display",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-body",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.pngcoffee.com"),
@@ -58,7 +71,10 @@ export default function RootLayout({
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
-        <SmoothScrollProvider>{children}</SmoothScrollProvider>
+        <CartProvider>
+          <SmoothScrollProvider>{children}</SmoothScrollProvider>
+          <CartDrawer />
+        </CartProvider>
       </body>
     </html>
   );
