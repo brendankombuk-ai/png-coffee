@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { valueCards as staticValueCards, type ValueCard } from "@/data/content";
 import { staggerContainer, cardReveal } from "@/lib/animations";
@@ -63,8 +62,8 @@ const icons: Record<ValueCard["icon"], () => JSX.Element> = {
 
 function ValueCardItem({ card, index }: { card: ValueCard; index: number }) {
   const Icon = icons[card.icon];
-  const content = (
-    <>
+  return (
+    <motion.article variants={cardReveal} className="group">
       <div
         className={`relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl transition-transform duration-500 group-hover:scale-[1.02]`}
       >
@@ -98,26 +97,6 @@ function ValueCardItem({ card, index }: { card: ValueCard; index: number }) {
           &#8212;&#8594;
         </span>
       </p>
-    </>
-  );
-
-  if (card.href) {
-    return (
-      <motion.article variants={cardReveal} className="group">
-        <Link
-          href={card.href}
-          className="block rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ember-200"
-          aria-label={`Learn more about ${card.title}`}
-        >
-          {content}
-        </Link>
-      </motion.article>
-    );
-  }
-
-  return (
-    <motion.article variants={cardReveal} className="group">
-      {content}
     </motion.article>
   );
 }

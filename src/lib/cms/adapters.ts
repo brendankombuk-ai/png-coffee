@@ -329,16 +329,38 @@ export async function getProductCategoryPageData(
 
 /* ============================== Contact page ============================== */
 
-export async function getContactPage(): Promise<CmsContactPage | null> {
+export async function getContactPageData(): Promise<
+  typeof fallback.contactPage & { seoTitle?: string | null; seoDescription?: string | null }
+> {
   try {
     const res = await strapiFetch<StrapiSingleResponse<CmsContactPage>>("/contact-page", {
       query: "populate=*",
       tags: ["contact-page"],
     });
-    return res.data;
+    const d = res.data;
+    if (!d) throw new CmsFetchError("Contact Page entry not found");
+
+    return {
+      // Hero/intro copy isn't in the Strapi schema (marketing copy, not
+      // treated as CMS-editable content) — always from static content.
+      heroTitle: fallback.contactPage.heroTitle,
+      heroSubtitle: fallback.contactPage.heroSubtitle,
+      introHeading: fallback.contactPage.introHeading,
+      introText: fallback.contactPage.introText,
+      phone: d.phone ?? fallback.contactPage.phone,
+      email: d.email ?? fallback.contactPage.email,
+      address: d.address ? d.address.split(/\n+/).filter(Boolean) : fallback.contactPage.address,
+      businessHours: d.businessHours.length ? d.businessHours : fallback.contactPage.businessHours,
+      socialLinks: d.socialLinks.length
+        ? (d.socialLinks as typeof fallback.contactPage.socialLinks)
+        : fallback.contactPage.socialLinks,
+      mapEmbedUrl: d.googleMapEmbedUrl ?? fallback.contactPage.mapEmbedUrl,
+      seoTitle: d.seoTitle,
+      seoDescription: d.seoDescription,
+    };
   } catch (err) {
-    logCmsFallback("getContactPage", err);
-    return null;
+    logCmsFallback("getContactPageData", err);
+    return fallback.contactPage;
   }
 }
 

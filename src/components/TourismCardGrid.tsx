@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { tourismCards as staticTourismCards, type TourismCard } from "@/data/content";
@@ -77,12 +78,12 @@ const icons: Record<TourismCard["icon"], () => JSX.Element> = {
 
 function Card({ card }: { card: TourismCard }) {
   const Icon = icons[card.icon];
-  return (
+  const body = (
     <motion.article
       variants={cardReveal}
       whileHover={{ y: -8, scale: 1.02 }}
       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-      className="overflow-hidden rounded-[28px] border border-white/[0.12] bg-[rgba(20,20,20,0.45)] p-7 shadow-[0_8px_40px_rgba(0,0,0,0.35)] backdrop-blur-[20px]"
+      className={`overflow-hidden rounded-[28px] border border-white/[0.12] bg-[rgba(20,20,20,0.45)] p-7 shadow-[0_8px_40px_rgba(0,0,0,0.35)] backdrop-blur-[20px] ${card.href ? "cursor-pointer" : ""}`}
     >
       <h3 className="font-display text-lg font-extrabold uppercase tracking-wide text-white sm:text-xl">
         {card.title}
@@ -110,6 +111,30 @@ function Card({ card }: { card: TourismCard }) {
       </div>
     </motion.article>
   );
+
+  if (card.href) {
+    const isExternal = /^https?:\/\//.test(card.href);
+    if (isExternal) {
+      return (
+        <a
+          href={card.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${card.title} (opens in a new tab)`}
+          className="block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ember-200"
+        >
+          {body}
+        </a>
+      );
+    }
+    return (
+      <Link href={card.href} aria-label={card.title} className="block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ember-200">
+        {body}
+      </Link>
+    );
+  }
+
+  return body;
 }
 
 export default function TourismCardGrid({

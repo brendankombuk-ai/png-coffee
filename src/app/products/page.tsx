@@ -16,14 +16,10 @@ export const metadata: Metadata = {
   title: "Our Coffee",
   description:
     "PNG Coffee is grown in the pristine highlands of Papua New Guinea and available as whole beans, ground, drip coffee, and capsules.",
-  alternates: {
-    canonical: "/products",
-  },
   openGraph: {
     title: `Our Coffee – ${site.name}`,
     description:
       "PNG Coffee is grown in the pristine highlands of Papua New Guinea and available as whole beans, ground, drip coffee, and capsules.",
-    url: "/products",
   },
 };
 

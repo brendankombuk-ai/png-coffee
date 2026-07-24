@@ -5,7 +5,7 @@ export const nav = {
     { label: "About", href: "/about" },
     { label: "PNG", href: "/png" },
     { label: "Products", href: "/products" },
-    { label: "Contact", href: "/#contact" },
+    { label: "Contact", href: "/contact" },
   ],
 };
 
@@ -73,14 +73,6 @@ export const site = {
   description:
     "PNG Coffee roasts and packs high-quality, small-batch coffee grown in the highlands of Papua New Guinea \u2014 PNG grown, shared with the world.",
   location: "Papua New Guinea",
-  url: "https://www.pngcoffee.com",
-};
-
-/** Structured postal address for the roastery, used in LocalBusiness JSON-LD. */
-export const businessAddress = {
-  streetAddress: "Gabaka Street",
-  addressLocality: "Gordon, Port Moresby",
-  addressCountry: "PG",
 };
 
 /* ---------------------------- About page content ---------------------------- */
@@ -152,8 +144,6 @@ export type ValueCard = {
   image: string;
   alt: string;
   accent: string;
-  /** Dedicated page this card links to (About page cards navigate via next/link). */
-  href?: string;
 };
 
 export const valueCards: ValueCard[] = [
@@ -166,7 +156,6 @@ export const valueCards: ValueCard[] = [
     image: "/images/about-values/value-added.jpg",
     alt: "Roasted coffee beans, ground coffee, and packaged value-added coffee products",
     accent: "from-ember-600 to-ember-800",
-    href: "/value-added",
   },
   {
     id: "roastery",
@@ -177,7 +166,6 @@ export const valueCards: ValueCard[] = [
     image: "/images/about-values/roastery.jpg",
     alt: "PNG Coffee's roasting machine at the Gabaka Street roastery",
     accent: "from-ember-500 to-void-900",
-    href: "/the-roastery",
   },
   {
     id: "barista-training",
@@ -188,7 +176,6 @@ export const valueCards: ValueCard[] = [
     image: "/images/about-values/barista-training.jpg",
     alt: "Barista tamping espresso grounds during a training session",
     accent: "from-ember-400 to-ember-600",
-    href: "/barista-training",
   },
   {
     id: "equipment-service",
@@ -199,7 +186,6 @@ export const valueCards: ValueCard[] = [
     image: "/images/about-values/equipment-service.jpg",
     alt: "Row of professional espresso machines and grinders being serviced",
     accent: "from-void-900 to-ember-900",
-    href: "/coffee-equipment-service",
   },
 ];
 
@@ -339,6 +325,85 @@ export const pngTourism = {
   ],
 };
 
+export type HeartOfPngCard = {
+  id: string;
+  title: string;
+  description: string;
+  /** Real photo not yet supplied — see PROJECT_HANDOFF notes. */
+  image?: string;
+  alt?: string;
+};
+
+export const heartOfPngPage = {
+  title: "\u201cThe Heart Of Papua New Guinea : A Tapestry Of Tradition\u201d",
+  cards: [
+    {
+      id: "diversity",
+      title: "Diversity",
+      description:
+        "Papua New Guinea is one of the most culturally diverse countries in the world, with over 800 distinct languages and various traditional customs across regions. These languages and cultures are often tied to specific tribes or villages.",
+      image: "/images/heart-of-png/diversity.jpg",
+      alt: "Highlands warriors in traditional headdress and face paint at a PNG cultural show",
+    },
+    {
+      id: "traditional-art-craft",
+      title: "Traditional Art and Craft",
+      description:
+        "The people of Papua New Guinea are known for their traditional art, including vibrant carvings, intricate basket weaving, and colorful body painting. These crafts often carry significant cultural and spiritual meaning.",
+      image: "/images/heart-of-png/traditional-art-craft.jpg",
+      alt: "Hand-painted traditional PNG carvings and artwork",
+    },
+    {
+      id: "ceremonies-festivals",
+      title: "Ceremonies and Festivals",
+      description:
+        "Cultural ceremonies are important, with many involving traditional dances, songs, and rituals. Events like the Mount Hagen Cultural Show showcase the vibrant traditions of different tribes through performances and displays of dance, music, and costumes.",
+      image: "/images/heart-of-png/ceremonies-festivals.jpg",
+      alt: "Group in traditional dress preparing for a cultural ceremony",
+    },
+    {
+      id: "kastom",
+      title: "Kastom",
+      description:
+        "The term \u201ckastom\u201d refers to the traditional customs and practices that vary between tribes. These practices influence social structures, rituals, and daily life, with some communities following ancient customs that have been passed down through generations.",
+      image: "/images/heart-of-png/kastom.jpg",
+      alt: "Ceremonial mask and traditional dress at a PNG cultural gathering",
+    },
+    {
+      id: "sing-sing",
+      title: "The Sing-Sing",
+      description:
+        "Sing-Sing is a large cultural gathering, where various tribes come together to showcase their unique dances, songs, and traditional dress. These events are significant for community bonding and celebrating identity.",
+      image: "/images/heart-of-png/sing-sing.jpg",
+      alt: "Performers in feathered headdresses at a PNG sing-sing festival",
+    },
+    {
+      id: "traditional-clothing",
+      title: "Traditional Clothing",
+      description:
+        "Traditional attire varies, often made from natural materials such as bark, leaves, and feathers. In some communities, people wear intricate headdresses, body paint, and adornments made from shells, bones, and other locally sourced materials.",
+      image: "/images/heart-of-png/traditional-clothing.jpg",
+      alt: "Traditional PNG attire with body paint and grass skirts",
+    },
+    {
+      id: "ties-to-nature",
+      title: "Ties To Nature",
+      description:
+        "The people of Papua New Guinea have a deep connection to the land and sea, often living off subsistence farming and fishing. Many of their customs and beliefs are rooted in respect for the environment, with certain areas being considered sacred.",
+      image: "/images/heart-of-png/ties-to-nature.jpg",
+      alt: "Turquoise reef lagoon fringed by tropical rainforest",
+    },
+    {
+      id: "spirituality",
+      title: "Spirituality",
+      description:
+        "Spiritual beliefs are central to life in Papua New Guinea, with animism being common in many communities. People believe that the land, animals, and even objects have spiritual significance, influencing various cultural practices and rituals.",
+      image: "/images/heart-of-png/spirituality.jpg",
+      alt: "Dancers in traditional feathered dress at a spiritual cultural gathering",
+    },
+  ] as HeartOfPngCard[],
+};
+
 export type TourismCard = {
   id: string;
   title: string;
@@ -347,6 +412,8 @@ export type TourismCard = {
   image: string;
   alt: string;
   accent: string;
+  /** Optional link — when present, the card becomes clickable. */
+  href?: string;
 };
 
 export const tourismCards: TourismCard[] = [
@@ -359,6 +426,7 @@ export const tourismCards: TourismCard[] = [
     image: "/images/png-tourism/tradition.jpg",
     alt: "Traditional PNG sing-sing headdress and painted mask",
     accent: "from-ember-700 to-void-900",
+    href: "/png/heart-of-papua-new-guinea",
   },
   {
     id: "surprises",
@@ -369,6 +437,7 @@ export const tourismCards: TourismCard[] = [
     image: "/images/png-tourism/surprises.jpg",
     alt: "Tropical island beach fringed with palm trees",
     accent: "from-ember-500 to-ember-800",
+    href: "https://www.tripadvisor.com/Attractions-g294115-Activities-Papua_New_Guinea.html",
   },
   {
     id: "underworld",
@@ -379,6 +448,7 @@ export const tourismCards: TourismCard[] = [
     image: "/images/png-tourism/underworld.jpg",
     alt: "Crystal-clear coral reef seen from the waterline",
     accent: "from-ember-600 to-void-900",
+    href: "https://www.tripadvisor.com/HotelsList-Papua_New_Guinea-Diving-Resorts-zfp7671395.html",
   },
   {
     id: "kokoda",
@@ -389,6 +459,7 @@ export const tourismCards: TourismCard[] = [
     image: "/images/png-tourism/kokoda.jpg",
     alt: "Trekkers walking through a highlands village on the Kokoda Track",
     accent: "from-void-900 to-ember-900",
+    href: "https://www.tripadvisor.com.au/AttractionProductReview-g294118-d20870744-ADVENTURE_KOKODA_10_Day_Premium_Kokoda_Campaign_Trek_Australian_Led-Port_Moresby_P.html",
   },
   {
     id: "wilhelm",
@@ -399,6 +470,7 @@ export const tourismCards: TourismCard[] = [
     image: "/images/png-tourism/wilhelm.jpg",
     alt: "Cloud-wreathed summit ridge of Mount Wilhelm",
     accent: "from-ember-400 to-ember-700",
+    href: "https://www.tripadvisor.com/Attraction_Review-g304035-d309629-Reviews-Mount_Wilhelm-Mount_Hagen_Highlands_Region.html",
   },
   {
     id: "birds",
@@ -409,6 +481,7 @@ export const tourismCards: TourismCard[] = [
     image: "/images/png-tourism/birds.jpg",
     alt: "Raggiana bird-of-paradise displaying its plumage on a branch",
     accent: "from-ember-700 to-ember-900",
+    href: "https://www.tripadvisor.com/Attraction_Review-g294118-d309620-Reviews-Varirata_National_Park-Port_Moresby_Papua_Region.html",
   },
 ];
 
@@ -473,65 +546,6 @@ export const productsValueAdded = {
   ],
   outro:
     "Our products cater to retail customers, restaurants, cafes, and export markets, ensuring that the world can enjoy the authentic taste of PNG coffee.",
-};
-
-/* ---------------------------- The Roastery page content ---------------------------- */
-
-export const roasteryHero = {
-  title: "The Roastery",
-  paragraphs: [
-    "Located at Gabaka Street, Gordon, Port Moresby, our state-of-the-art roastery allows us to provide fresher and higher-quality coffee to our corporate customers. Here, we craft custom blends and micro-lots of single-origin beans, ensuring a unique and personalised coffee experience.",
-  ],
-};
-
-export const coffeeShowroom = {
-  heading: "Coffee Showroom",
-  paragraphs: [
-    "Our roastery is showcased in a stunning glass cube, where visitors can witness the art of coffee roasting. The showroom features a complete range of coffee equipment for cafes and restaurants, including:",
-  ],
-  items: ["De-stoners", "Colour Sorters", "Tabletop Roasters", "Espresso Machines"],
-  outro:
-    "This space is designed to inspire and educate, offering a glimpse into the world of premium coffee production.",
-  image: "/images/about-values/roastery.jpg",
-  alt: "Industrial coffee roasting machine inside the PNG Coffee showroom",
-};
-
-export type EquipmentItem = { id: string; label: string; alt: string };
-
-export const roasteryEquipment: EquipmentItem[] = [
-  { id: "destoner", label: "De-stoner", alt: "Coffee bean de-stoner machine" },
-  { id: "colour-sorter", label: "Colour Sorter", alt: "Coffee colour sorting machine" },
-  { id: "tabletop-roaster", label: "Tabletop Roaster", alt: "Tabletop coffee roaster" },
-  { id: "espresso-machine", label: "Espresso Machine", alt: "Commercial espresso machine" },
-  { id: "packaging-sealer", label: "Packaging Sealer", alt: "Coffee bag packaging sealer" },
-];
-
-/* ---------------------------- Barista Training page content ---------------------------- */
-
-export const baristaTrainingHero = {
-  title: "Barista Training",
-  paragraphs: [
-    "Our baristas and personnel are trained and qualified in Australia, bringing world-class expertise to PNG. We also offer short courses for aspiring baristas who are passionate about mastering the art of coffee-making.",
-  ],
-};
-
-export const baristaTrainingImage = {
-  src: "/images/about-values/barista-training.jpg",
-  alt: "Barista tamping espresso grounds during a training session",
-};
-
-/* ---------------------------- Coffee Equipment Service page content ---------------------------- */
-
-export const equipmentServiceHero = {
-  title: "Coffee Equipment Service",
-  paragraphs: [
-    "We provide comprehensive servicing for all coffee equipment, carried out by qualified technicians. Our team is trusted by leading hotel groups, eliminating the need for overseas repair services and ensuring that your equipment operates at its best.",
-  ],
-};
-
-export const equipmentServiceImage = {
-  src: "/images/about-values/equipment-service.jpg",
-  alt: "Row of professional espresso machines and grinders being serviced",
 };
 
 /* ------------------------- Product category detail pages ------------------------- */
@@ -723,4 +737,47 @@ export const productCategoryPages: Record<string, ProductCategoryPageData> = {
       },
     ],
   },
+};
+
+/* ---------------------------------- Contact page ---------------------------------- */
+
+export type ContactPageContent = {
+  heroTitle: string;
+  heroSubtitle: string;
+  introHeading: string;
+  introText: string;
+  phone: string;
+  email: string;
+  address: string[];
+  businessHours: { day: string; hours: string }[];
+  socialLinks: { platform: "Facebook" | "Instagram" | "Twitter" | "YouTube"; url: string }[];
+  mapEmbedUrl: string;
+};
+
+export const contactPage: ContactPageContent = {
+  heroTitle: "Contact Us",
+  heroSubtitle: "PNG Coffee is ready to answer your questions, wherever you're brewing from.",
+  introHeading: "Get In Touch",
+  introText:
+    "Whether you're a retail customer, a cafe, or looking to become a wholesale partner, we'd love to hear from you.",
+  phone: "+675 7244 4888",
+  email: "swissxpresso.png@gmail.com",
+  address: [
+    "Sec 64, Lot 11 Gabaka Street, Gordons",
+    "Port Moresby, National Capital District",
+    "Papua New Guinea",
+  ],
+  businessHours: [
+    { day: "Monday – Friday", hours: "8:00 AM – 5:00 PM" },
+    { day: "Saturday", hours: "9:00 AM – 1:00 PM" },
+    { day: "Sunday", hours: "Closed" },
+  ],
+  socialLinks: [
+    { platform: "Facebook", url: "https://facebook.com/pngcoffee" },
+    { platform: "Instagram", url: "https://instagram.com/pngcoffee" },
+    { platform: "Twitter", url: "https://twitter.com/pngcoffee" },
+    { platform: "YouTube", url: "https://youtube.com/@pngcoffee" },
+  ],
+  mapEmbedUrl:
+    "https://www.google.com/maps?q=Sec+64+Lot+11+Gabaka+Street+Gordons+Port+Moresby+National+Capital+District+Papua+New+Guinea&output=embed",
 };

@@ -23,7 +23,7 @@ export default function Footer() {
           <p className="font-display text-xs font-bold uppercase tracking-[0.25em] text-ember-400">
             Get In Touch
           </p>
-          <p className="mt-2">hello@pngcoffee.com</p>
+          <p className="mt-2">swissxpresso.png@gmail.com</p>
           <p>{site.location}</p>
         </div>
       </div>
