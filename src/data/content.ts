@@ -73,6 +73,7 @@ export const site = {
   description:
     "PNG Coffee roasts and packs high-quality, small-batch coffee grown in the highlands of Papua New Guinea \u2014 PNG grown, shared with the world.",
   location: "Papua New Guinea",
+  url: "https://www.pngcoffee.com",
 };
 
 /* ---------------------------- About page content ---------------------------- */
@@ -546,6 +547,65 @@ export const productsValueAdded = {
   ],
   outro:
     "Our products cater to retail customers, restaurants, cafes, and export markets, ensuring that the world can enjoy the authentic taste of PNG coffee.",
+};
+
+/* ---------------------------- The Roastery page content ---------------------------- */
+
+export const roasteryHero = {
+  title: "The Roastery",
+  paragraphs: [
+    "Located at Gabaka Street, Gordon, Port Moresby, our state-of-the-art roastery allows us to provide fresher and higher-quality coffee to our corporate customers. Here, we craft custom blends and micro-lots of single-origin beans, ensuring a unique and personalised coffee experience.",
+  ],
+};
+
+export const coffeeShowroom = {
+  heading: "Coffee Showroom",
+  paragraphs: [
+    "Our roastery is showcased in a stunning glass cube, where visitors can witness the art of coffee roasting. The showroom features a complete range of coffee equipment for cafes and restaurants, including:",
+  ],
+  items: ["De-stoners", "Colour Sorters", "Tabletop Roasters", "Espresso Machines"],
+  outro:
+    "This space is designed to inspire and educate, offering a glimpse into the world of premium coffee production.",
+  image: "/images/about-values/roastery.jpg",
+  alt: "Industrial coffee roasting machine inside the PNG Coffee showroom",
+};
+
+export type EquipmentItem = { id: string; label: string; alt: string };
+
+export const roasteryEquipment: EquipmentItem[] = [
+  { id: "destoner", label: "De-stoner", alt: "Coffee bean de-stoner machine" },
+  { id: "colour-sorter", label: "Colour Sorter", alt: "Coffee colour sorting machine" },
+  { id: "tabletop-roaster", label: "Tabletop Roaster", alt: "Tabletop coffee roaster" },
+  { id: "espresso-machine", label: "Espresso Machine", alt: "Commercial espresso machine" },
+  { id: "packaging-sealer", label: "Packaging Sealer", alt: "Coffee bag packaging sealer" },
+];
+
+/* ---------------------------- Barista Training page content ---------------------------- */
+
+export const baristaTrainingHero = {
+  title: "Barista Training",
+  paragraphs: [
+    "Our baristas and personnel are trained and qualified in Australia, bringing world-class expertise to PNG. We also offer short courses for aspiring baristas who are passionate about mastering the art of coffee-making.",
+  ],
+};
+
+export const baristaTrainingImage = {
+  src: "/images/about-values/barista-training.jpg",
+  alt: "Barista tamping espresso grounds during a training session",
+};
+
+/* ---------------------------- Coffee Equipment Service page content ---------------------------- */
+
+export const equipmentServiceHero = {
+  title: "Coffee Equipment Service",
+  paragraphs: [
+    "We provide comprehensive servicing for all coffee equipment, carried out by qualified technicians. Our team is trusted by leading hotel groups, eliminating the need for overseas repair services and ensuring that your equipment operates at its best.",
+  ],
+};
+
+export const equipmentServiceImage = {
+  src: "/images/about-values/equipment-service.jpg",
+  alt: "Row of professional espresso machines and grinders being serviced",
 };
 
 /* ------------------------- Product category detail pages ------------------------- */
