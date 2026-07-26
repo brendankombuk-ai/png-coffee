@@ -73,6 +73,7 @@ export const site = {
   description:
     "PNG Coffee roasts and packs high-quality, small-batch coffee grown in the highlands of Papua New Guinea \u2014 PNG grown, shared with the world.",
   location: "Papua New Guinea",
+  url: "https://www.pngcoffee.com",
 };
 
 /* ---------------------------- About page content ---------------------------- */
@@ -160,10 +161,7 @@ export const valueCards: ValueCard[] = [
     image: "/images/about-values/value-added.jpg",
     alt: "Roasted coffee beans, ground coffee, and packaged value-added coffee products",
     accent: "from-ember-600 to-ember-800",
-    // Value Added showcases finished retail products, so it links straight
-    // to the existing, fully-built Products catalogue rather than a
-    // separate detail page.
-    href: "/products",
+    href: "/value-added",
   },
   {
     id: "roastery",
@@ -175,6 +173,7 @@ export const valueCards: ValueCard[] = [
     image: "/images/about-values/roastery.jpg",
     alt: "PNG Coffee's roasting machine at the Gabaka Street roastery",
     accent: "from-ember-500 to-void-900",
+    href: "/the-roastery",
   },
   {
     id: "barista-training",
@@ -186,6 +185,7 @@ export const valueCards: ValueCard[] = [
     image: "/images/about-values/barista-training.jpg",
     alt: "Barista tamping espresso grounds during a training session",
     accent: "from-ember-400 to-ember-600",
+    href: "/barista-training",
   },
   {
     id: "equipment-service",
@@ -197,6 +197,7 @@ export const valueCards: ValueCard[] = [
     image: "/images/about-values/equipment-service.jpg",
     alt: "Row of professional espresso machines and grinders being serviced",
     accent: "from-void-900 to-ember-900",
+    href: "/coffee-equipment-service",
   },
 ];
 
@@ -208,78 +209,104 @@ export type ValueCardDetail = {
 };
 
 export const valueCardDetails: Record<string, ValueCardDetail> = {
-  // "roastery", "barista-training" and "equipment-service" have bespoke
-  // page designs now (see roasteryPage / baristaTrainingPage /
-  // equipmentServicePage below) and dedicated static routes at
-  // /about/roastery, /about/barista-training, /about/equipment-service —
-  // they're intentionally not listed here any more. "value-added" links
-  // straight to /products (see its `href` in valueCards above) and never
-  // had a detail page of its own.
+  // The Roastery, Barista Training and Coffee Equipment Service each have a
+  // bespoke top-level page (/the-roastery, /barista-training,
+  // /coffee-equipment-service) with their own data exports below, and
+  // "Value Added" has its own page at /value-added. None use the generic
+  // detail template, so this lookup is intentionally empty — it's kept only
+  // for the CMS adapter's fallback signature.
 };
 
 /* ---------------------------- About > The Roastery ---------------------------- */
 
-export const roasteryPage = {
+export type EquipmentItem = {
+  id: string;
+  label: string;
+  alt: string;
+  image: string;
+};
+
+export const roasteryHero = {
   title: "The Roastery",
-  intro:
-    "Located at Gabaka Street, Gordon, Port Moresby, our state-of-the-art roastery allows us to provide fresher and higher-quality coffee to our corporate customers. Here, we craft custom blends and micro-lots of single-origin beans, ensuring a unique and personalised coffee experience.",
-  heroImage: "/images/about-values/roastery.jpg",
-  heroAlt: "PNG Coffee's roasting machine at the Gabaka Street roastery",
-  showroom: {
-    heading: "Coffee Showroom",
-    paragraph:
-      "Our roastery is showcased in a stunning glass cube, where visitors can witness the art of coffee roasting. The showroom features a complete range of coffee equipment for cafes and restaurants, including:",
-    bullets: ["De-stoners", "Colour Sorters", "Tabletop Roasters", "Espresso Machines"],
-    closing:
-      "This space is designed to inspire and educate, offering a glimpse into the world of premium coffee production.",
-  },
-  gallery: [
-    {
-      label: "De-Stoner",
-      alt: "Coffee bean de-stoning machine",
-      image: "/images/about-values/gallery/de-stoner.png",
-    },
-    {
-      label: "Bagging & Filling",
-      alt: "Automated coffee bagging and filling machine with touchscreen",
-      image: "/images/about-values/gallery/bagging-filling.png",
-    },
-    {
-      label: "Roaster",
-      alt: "Tall stainless coffee roasting and packaging tower",
-      image: "/images/about-values/gallery/roaster.png",
-    },
-    {
-      label: "Weighing & Filling",
-      alt: "Coffee weighing and filling unit with control panel",
-      image: "/images/about-values/gallery/weighing-filling.png",
-    },
-    {
-      label: "Sealing Line",
-      alt: "Continuous coffee bag sealing conveyor line with green belt",
-      image: "/images/about-values/gallery/sealing-line.png",
-    },
+  paragraphs: [
+    "Located at Gabaka Street, Gordon, Port Moresby, our state-of-the-art roastery allows us to provide fresher and higher-quality coffee to our corporate customers.",
+    "Here, we craft custom blends and micro-lots of single-origin beans, ensuring a unique and personalised coffee experience.",
   ],
 };
 
+export const coffeeShowroom = {
+  heading: "Coffee Showroom",
+  paragraphs: [
+    "Our roastery is showcased in a stunning glass cube, where visitors can witness the art of coffee roasting. The showroom features a complete range of coffee equipment for cafes and restaurants, including:",
+  ],
+  items: ["De-stoners", "Colour Sorters", "Tabletop Roasters", "Espresso Machines"],
+  outro:
+    "This space is designed to inspire and educate, offering a glimpse into the world of premium coffee production.",
+  image: "/images/about-values/roastery.jpg",
+  alt: "PNG Coffee's roasting machine at the Gabaka Street roastery",
+};
+
+export const roasteryEquipment: EquipmentItem[] = [
+  {
+    id: "de-stoner",
+    label: "De-Stoner",
+    alt: "Coffee bean de-stoning machine",
+    image: "/images/about-values/gallery/de-stoner.png",
+  },
+  {
+    id: "bagging-filling",
+    label: "Bagging & Filling",
+    alt: "Automated coffee bagging and filling machine with touchscreen",
+    image: "/images/about-values/gallery/bagging-filling.png",
+  },
+  {
+    id: "roaster",
+    label: "Roaster",
+    alt: "Tall stainless coffee roasting and packaging tower",
+    image: "/images/about-values/gallery/roaster.png",
+  },
+  {
+    id: "weighing-filling",
+    label: "Weighing & Filling",
+    alt: "Coffee weighing and filling unit with control panel",
+    image: "/images/about-values/gallery/weighing-filling.png",
+  },
+  {
+    id: "sealing-line",
+    label: "Sealing Line",
+    alt: "Continuous coffee bag sealing conveyor line with green belt",
+    image: "/images/about-values/gallery/sealing-line.png",
+  },
+];
+
 /* ---------------------------- About > Barista Training ---------------------------- */
 
-export const baristaTrainingPage = {
+export const baristaTrainingHero = {
   title: "Barista Training",
-  intro:
-    "Our baristas and personnel are trained and qualified in Australia, bringing world-class expertise to PNG. We also offer short courses for aspiring baristas who are passionate about mastering the art of coffee-making.",
-  heroImage: "/images/about-values/barista-training.jpg",
-  heroAlt: "Barista tamping espresso grounds during a training session",
+  paragraphs: [
+    "Our baristas and personnel are trained and qualified in Australia, bringing world-class expertise to PNG.",
+    "We also offer short courses for aspiring baristas who are passionate about mastering the art of coffee-making.",
+  ],
+};
+
+export const baristaTrainingImage = {
+  src: "/images/about-values/barista-training.jpg",
+  alt: "Barista tamping freshly ground espresso during a training session",
 };
 
 /* ---------------------------- About > Coffee Equipment Service ---------------------------- */
 
-export const equipmentServicePage = {
+export const equipmentServiceHero = {
   title: "Coffee Equipment Service",
-  intro:
-    "We provide comprehensive servicing for all coffee equipment, carried out by qualified technicians. Our team is trusted by leading hotel groups, eliminating the need for overseas repair services and ensuring that your equipment operates at its best.",
-  heroImage: "/images/about-values/equipment-service.jpg",
-  heroAlt: "Row of professional espresso machines and grinders being serviced",
+  paragraphs: [
+    "We provide comprehensive servicing for all coffee equipment, carried out by qualified technicians.",
+    "Our team is trusted by leading hotel groups, eliminating the need for overseas repair services and ensuring that your equipment operates at its best.",
+  ],
+};
+
+export const equipmentServiceImage = {
+  src: "/images/about-values/equipment-service.jpg",
+  alt: "A row of professional espresso machines and grinders on a cafe counter",
 };
 
 export type Product = {

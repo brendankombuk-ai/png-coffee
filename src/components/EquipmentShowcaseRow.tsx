@@ -1,24 +1,15 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { roasteryEquipment as staticEquipment, type EquipmentItem } from "@/data/content";
 import { staggerContainer, fadeUp } from "@/lib/animations";
 
-function MachineMark() {
-  return (
-    <svg viewBox="0 0 48 48" className="h-7 w-7 text-ember-600" aria-hidden="true">
-      <rect x="10" y="14" width="28" height="26" rx="3" fill="none" stroke="currentColor" strokeWidth="2" />
-      <path d="M16 14 V8 h16 v6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-      <path d="M16 24 h16 M16 30 h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
 /**
  * White strip of equipment tiles shown in the roastery's showroom, matching
- * the site's white-panel treatment used by ExploreBanner. Renders styled
- * placeholder tiles (icon + label) until real product photography is
- * supplied — swap in an `image` field on EquipmentItem and an <Image> here.
+ * the site's white-panel treatment used by ExploreBanner. Each tile shows a
+ * real cut-out photo of the machine (transparent PNG, object-contain) above
+ * its label.
  */
 export default function EquipmentShowcaseRow({
   equipment = staticEquipment,
@@ -38,13 +29,18 @@ export default function EquipmentShowcaseRow({
           <motion.div
             key={item.id}
             variants={fadeUp}
-            role="img"
-            aria-label={item.alt}
-            className="group flex flex-col items-center gap-3 rounded-xl border border-black/5 bg-black/[0.02] px-4 py-6 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_40px_-18px_rgba(232,52,28,0.45)]"
+            className="group flex flex-col items-center gap-3 rounded-xl border border-black/5 bg-black/[0.02] px-4 py-5 text-center transition-all duration-300 hover:-translate-y-1 hover:border-ember-500/30 hover:shadow-[0_16px_40px_-18px_rgba(232,52,28,0.45)]"
           >
-            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-ember-50 transition-colors duration-300 group-hover:bg-ember-100">
-              <MachineMark />
-            </span>
+            <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-white">
+              <Image
+                src={item.image}
+                alt={item.alt}
+                fill
+                sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 18vw"
+                className="object-contain p-3 transition-transform duration-500 group-hover:scale-[1.05]"
+                loading="lazy"
+              />
+            </div>
             <span className="text-xs font-semibold uppercase tracking-wide text-void-900/70">
               {item.label}
             </span>
