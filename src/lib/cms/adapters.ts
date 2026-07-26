@@ -1,4 +1,5 @@
 import { strapiFetch, mediaUrl, CmsFetchError } from "./client";
+import { slugify } from "@/lib/slugify";
 import type {
   StrapiCollectionResponse,
   StrapiSingleResponse,
@@ -17,6 +18,7 @@ import * as fallback from "@/data/content";
 import type {
   FeatureCard,
   ValueCard,
+  ValueCardDetail,
   TourismCard,
   ProductCategory,
   ProductPlaceholder,
@@ -168,19 +170,53 @@ export async function getValueCards(): Promise<ValueCard[]> {
     });
     const cards = res.data?.valueCards;
     if (!cards || cards.length === 0) throw new CmsFetchError("No value cards in CMS");
-    return cards.map((c, i) => ({
-      id: `value-card-${i}`,
-      title: c.title,
-      description: c.description,
-      icon: c.icon,
-      image: mediaUrl(c.image?.url),
-      alt: c.alt ?? c.title,
-      accent: c.accent ?? "from-ember-600 to-ember-800",
-    }));
+    return cards.map((c) => {
+      const slug = slugify(c.title);
+      return {
+        id: slug,
+        slug,
+        title: c.title,
+        description: c.description,
+        icon: c.icon,
+        image: mediaUrl(c.image?.url),
+        alt: c.alt ?? c.title,
+        accent: c.accent ?? "from-ember-600 to-ember-800",
+      };
+    });
   } catch (err) {
     logCmsFallback("getValueCards", err);
     return fallback.valueCards;
   }
+}
+
+/**
+ * Full detail-page content for a single value card, looked up by slug.
+ *
+ * Strapi's `about-us` value-card component doesn't have long-form body
+ * content yet, so this only tries the CMS for the summary fields (title,
+ * description, image) and always sources the long-form paragraphs and
+ * highlights from static content. If a slug matches neither the CMS nor the
+ * static detail map, this returns null and the page 404s.
+ */
+export async function getValueCardDetail(
+  slug: string
+): Promise<(ValueCard & ValueCardDetail) | null> {
+  const cards = await getValueCards();
+  const card = cards.find((c) => c.slug === slug);
+  if (!card) return null;
+
+  const detail = fallback.valueCardDetails[slug];
+  if (detail) return { ...card, ...detail };
+
+  // A CMS-authored card with no matching static detail content yet still
+  // gets a working page, just without the extended body/highlights.
+  return {
+    ...card,
+    eyebrow: card.title,
+    intro: card.description,
+    paragraphs: [card.description],
+    highlights: [],
+  };
 }
 
 /* ============================== PNG page ============================== */

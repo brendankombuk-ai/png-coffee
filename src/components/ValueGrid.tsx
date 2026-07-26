@@ -63,7 +63,11 @@ const icons: Record<ValueCard["icon"], () => JSX.Element> = {
 function ValueCardItem({ card, index }: { card: ValueCard; index: number }) {
   const Icon = icons[card.icon];
   return (
-    <motion.article variants={cardReveal} className="group">
+    <motion.a
+      href={card.href ?? `/about/${card.slug}`}
+      variants={cardReveal}
+      className="group block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ember-200"
+    >
       <div
         className={`relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl transition-transform duration-500 group-hover:scale-[1.02]`}
       >
@@ -97,7 +101,7 @@ function ValueCardItem({ card, index }: { card: ValueCard; index: number }) {
           &#8212;&#8594;
         </span>
       </p>
-    </motion.article>
+    </motion.a>
   );
 }
 

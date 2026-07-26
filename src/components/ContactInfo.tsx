@@ -1,11 +1,24 @@
-import { Building2, Clock, Facebook, Instagram, Mail, Phone, Twitter, Youtube } from "lucide-react";
+import { Building2, Clock, Facebook, Instagram, Mail, Phone } from "lucide-react";
 import type { ContactPageContent } from "@/data/content";
+
+function TikTokIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M16.6 5.82c-.8-.8-1.25-1.87-1.25-3.02h-3.06v13.44c0 1.53-1.24 2.77-2.77 2.77a2.77 2.77 0 0 1-2.77-2.77 2.77 2.77 0 0 1 2.77-2.77c.29 0 .57.04.83.13V10.5a5.87 5.87 0 0 0-.83-.06A5.83 5.83 0 0 0 3.68 16.27a5.83 5.83 0 0 0 5.84 5.83 5.83 5.83 0 0 0 5.84-5.83V9.01a8.94 8.94 0 0 0 5.22 1.67V7.62a5.6 5.6 0 0 1-3.98-1.8z" />
+    </svg>
+  );
+}
 
 const SOCIAL_ICONS: Record<string, typeof Facebook> = {
   Facebook,
   Instagram,
-  Twitter,
-  YouTube: Youtube,
+  TikTok: TikTokIcon as typeof Facebook,
 };
 
 export default function ContactInfo({

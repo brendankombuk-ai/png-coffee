@@ -73,7 +73,6 @@ export const site = {
   description:
     "PNG Coffee roasts and packs high-quality, small-batch coffee grown in the highlands of Papua New Guinea \u2014 PNG grown, shared with the world.",
   location: "Papua New Guinea",
-  url: "https://www.pngcoffee.com",
 };
 
 /* ---------------------------- About page content ---------------------------- */
@@ -139,17 +138,21 @@ export const missionSection = {
 
 export type ValueCard = {
   id: string;
+  slug: string;
   title: string;
   description: string;
   icon: "seal" | "flame" | "cup" | "gear";
   image: string;
   alt: string;
   accent: string;
+  /** Optional explicit link target. Falls back to `/about/${slug}` when omitted. */
+  href?: string;
 };
 
 export const valueCards: ValueCard[] = [
   {
     id: "value-added",
+    slug: "value-added",
     title: "Value Added",
     description:
       "In alignment with the directives of PNG's Government and the Coffee Industry Corporation (CIC)\u2026",
@@ -157,9 +160,14 @@ export const valueCards: ValueCard[] = [
     image: "/images/about-values/value-added.jpg",
     alt: "Roasted coffee beans, ground coffee, and packaged value-added coffee products",
     accent: "from-ember-600 to-ember-800",
+    // Value Added showcases finished retail products, so it links straight
+    // to the existing, fully-built Products catalogue rather than a
+    // separate detail page.
+    href: "/products",
   },
   {
     id: "roastery",
+    slug: "roastery",
     title: "The Roastery",
     description:
       "Located at Gabaka Street, Gordon, Port Moresby, our state-of-the-art roastery allows us to provide\u2026",
@@ -170,6 +178,7 @@ export const valueCards: ValueCard[] = [
   },
   {
     id: "barista-training",
+    slug: "barista-training",
     title: "Barista Training",
     description:
       "Our baristas and personnel are trained and qualified in Australia, bringing world-class expertise to PNG\u2026",
@@ -180,6 +189,7 @@ export const valueCards: ValueCard[] = [
   },
   {
     id: "equipment-service",
+    slug: "equipment-service",
     title: "Coffee Equipment Service",
     description:
       "We provide comprehensive servicing for all coffee equipment\u2026",
@@ -189,6 +199,88 @@ export const valueCards: ValueCard[] = [
     accent: "from-void-900 to-ember-900",
   },
 ];
+
+export type ValueCardDetail = {
+  eyebrow: string;
+  intro: string;
+  paragraphs: string[];
+  highlights: { title: string; description: string }[];
+};
+
+export const valueCardDetails: Record<string, ValueCardDetail> = {
+  // "roastery", "barista-training" and "equipment-service" have bespoke
+  // page designs now (see roasteryPage / baristaTrainingPage /
+  // equipmentServicePage below) and dedicated static routes at
+  // /about/roastery, /about/barista-training, /about/equipment-service —
+  // they're intentionally not listed here any more. "value-added" links
+  // straight to /products (see its `href` in valueCards above) and never
+  // had a detail page of its own.
+};
+
+/* ---------------------------- About > The Roastery ---------------------------- */
+
+export const roasteryPage = {
+  title: "The Roastery",
+  intro:
+    "Located at Gabaka Street, Gordon, Port Moresby, our state-of-the-art roastery allows us to provide fresher and higher-quality coffee to our corporate customers. Here, we craft custom blends and micro-lots of single-origin beans, ensuring a unique and personalised coffee experience.",
+  heroImage: "/images/about-values/roastery.jpg",
+  heroAlt: "PNG Coffee's roasting machine at the Gabaka Street roastery",
+  showroom: {
+    heading: "Coffee Showroom",
+    paragraph:
+      "Our roastery is showcased in a stunning glass cube, where visitors can witness the art of coffee roasting. The showroom features a complete range of coffee equipment for cafes and restaurants, including:",
+    bullets: ["De-stoners", "Colour Sorters", "Tabletop Roasters", "Espresso Machines"],
+    closing:
+      "This space is designed to inspire and educate, offering a glimpse into the world of premium coffee production.",
+  },
+  gallery: [
+    {
+      label: "De-Stoner",
+      alt: "Coffee bean de-stoning machine",
+      image: "/images/about-values/gallery/de-stoner.png",
+    },
+    {
+      label: "Bagging & Filling",
+      alt: "Automated coffee bagging and filling machine with touchscreen",
+      image: "/images/about-values/gallery/bagging-filling.png",
+    },
+    {
+      label: "Roaster",
+      alt: "Tall stainless coffee roasting and packaging tower",
+      image: "/images/about-values/gallery/roaster.png",
+    },
+    {
+      label: "Weighing & Filling",
+      alt: "Coffee weighing and filling unit with control panel",
+      image: "/images/about-values/gallery/weighing-filling.png",
+    },
+    {
+      label: "Sealing Line",
+      alt: "Continuous coffee bag sealing conveyor line with green belt",
+      image: "/images/about-values/gallery/sealing-line.png",
+    },
+  ],
+};
+
+/* ---------------------------- About > Barista Training ---------------------------- */
+
+export const baristaTrainingPage = {
+  title: "Barista Training",
+  intro:
+    "Our baristas and personnel are trained and qualified in Australia, bringing world-class expertise to PNG. We also offer short courses for aspiring baristas who are passionate about mastering the art of coffee-making.",
+  heroImage: "/images/about-values/barista-training.jpg",
+  heroAlt: "Barista tamping espresso grounds during a training session",
+};
+
+/* ---------------------------- About > Coffee Equipment Service ---------------------------- */
+
+export const equipmentServicePage = {
+  title: "Coffee Equipment Service",
+  intro:
+    "We provide comprehensive servicing for all coffee equipment, carried out by qualified technicians. Our team is trusted by leading hotel groups, eliminating the need for overseas repair services and ensuring that your equipment operates at its best.",
+  heroImage: "/images/about-values/equipment-service.jpg",
+  heroAlt: "Row of professional espresso machines and grinders being serviced",
+};
 
 export type Product = {
   id: string;
@@ -549,65 +641,6 @@ export const productsValueAdded = {
     "Our products cater to retail customers, restaurants, cafes, and export markets, ensuring that the world can enjoy the authentic taste of PNG coffee.",
 };
 
-/* ---------------------------- The Roastery page content ---------------------------- */
-
-export const roasteryHero = {
-  title: "The Roastery",
-  paragraphs: [
-    "Located at Gabaka Street, Gordon, Port Moresby, our state-of-the-art roastery allows us to provide fresher and higher-quality coffee to our corporate customers. Here, we craft custom blends and micro-lots of single-origin beans, ensuring a unique and personalised coffee experience.",
-  ],
-};
-
-export const coffeeShowroom = {
-  heading: "Coffee Showroom",
-  paragraphs: [
-    "Our roastery is showcased in a stunning glass cube, where visitors can witness the art of coffee roasting. The showroom features a complete range of coffee equipment for cafes and restaurants, including:",
-  ],
-  items: ["De-stoners", "Colour Sorters", "Tabletop Roasters", "Espresso Machines"],
-  outro:
-    "This space is designed to inspire and educate, offering a glimpse into the world of premium coffee production.",
-  image: "/images/about-values/roastery.jpg",
-  alt: "Industrial coffee roasting machine inside the PNG Coffee showroom",
-};
-
-export type EquipmentItem = { id: string; label: string; alt: string };
-
-export const roasteryEquipment: EquipmentItem[] = [
-  { id: "destoner", label: "De-stoner", alt: "Coffee bean de-stoner machine" },
-  { id: "colour-sorter", label: "Colour Sorter", alt: "Coffee colour sorting machine" },
-  { id: "tabletop-roaster", label: "Tabletop Roaster", alt: "Tabletop coffee roaster" },
-  { id: "espresso-machine", label: "Espresso Machine", alt: "Commercial espresso machine" },
-  { id: "packaging-sealer", label: "Packaging Sealer", alt: "Coffee bag packaging sealer" },
-];
-
-/* ---------------------------- Barista Training page content ---------------------------- */
-
-export const baristaTrainingHero = {
-  title: "Barista Training",
-  paragraphs: [
-    "Our baristas and personnel are trained and qualified in Australia, bringing world-class expertise to PNG. We also offer short courses for aspiring baristas who are passionate about mastering the art of coffee-making.",
-  ],
-};
-
-export const baristaTrainingImage = {
-  src: "/images/about-values/barista-training.jpg",
-  alt: "Barista tamping espresso grounds during a training session",
-};
-
-/* ---------------------------- Coffee Equipment Service page content ---------------------------- */
-
-export const equipmentServiceHero = {
-  title: "Coffee Equipment Service",
-  paragraphs: [
-    "We provide comprehensive servicing for all coffee equipment, carried out by qualified technicians. Our team is trusted by leading hotel groups, eliminating the need for overseas repair services and ensuring that your equipment operates at its best.",
-  ],
-};
-
-export const equipmentServiceImage = {
-  src: "/images/about-values/equipment-service.jpg",
-  alt: "Row of professional espresso machines and grinders being serviced",
-};
-
 /* ------------------------- Product category detail pages ------------------------- */
 /**
  * Placeholder product-catalog data for each category page (/products/[slug]).
@@ -810,7 +843,7 @@ export type ContactPageContent = {
   email: string;
   address: string[];
   businessHours: { day: string; hours: string }[];
-  socialLinks: { platform: "Facebook" | "Instagram" | "Twitter" | "YouTube"; url: string }[];
+  socialLinks: { platform: "Facebook" | "Instagram" | "TikTok"; url: string }[];
   mapEmbedUrl: string;
 };
 
@@ -833,10 +866,9 @@ export const contactPage: ContactPageContent = {
     { day: "Sunday", hours: "Closed" },
   ],
   socialLinks: [
-    { platform: "Facebook", url: "https://facebook.com/pngcoffee" },
-    { platform: "Instagram", url: "https://instagram.com/pngcoffee" },
-    { platform: "Twitter", url: "https://twitter.com/pngcoffee" },
-    { platform: "YouTube", url: "https://youtube.com/@pngcoffee" },
+    { platform: "Facebook", url: "https://www.facebook.com/share/1F5zznFU1h/?mibextid=wwXIfr" },
+    { platform: "Instagram", url: "https://www.instagram.com/pngcoffee?igsh=MWYzbDVvMmNjdXRnNQ%3D%3D&utm_source=qr" },
+    { platform: "TikTok", url: "https://www.tiktok.com/@pngcoffee1996?_r=1&_t=ZS-98GnkxJEsSK" },
   ],
   mapEmbedUrl:
     "https://www.google.com/maps?q=Sec+64+Lot+11+Gabaka+Street+Gordons+Port+Moresby+National+Capital+District+Papua+New+Guinea&output=embed",
