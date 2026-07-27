@@ -1,18 +1,72 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
 import { useCart } from "@/lib/cart/CartContext";
 import { formatPrice } from "@/lib/cart/currency";
+import { SHIPPING_COUNTRY_CODES, shippingQuote } from "@/lib/shipping/zones";
+
+const COUNTRY_STORAGE_KEY = "png-coffee-ship-country";
+
+// Render country names from ISO codes without shipping a name table.
+const regionNames =
+  typeof Intl !== "undefined" && "DisplayNames" in Intl
+    ? new Intl.DisplayNames(["en"], { type: "region" })
+    : null;
+
+function countryLabel(code: string): string {
+  try {
+    return regionNames?.of(code) ?? code;
+  } catch {
+    return code;
+  }
+}
+
+// Sort the destination list alphabetically by display name for the dropdown.
+const COUNTRY_OPTIONS = SHIPPING_COUNTRY_CODES.map((code) => ({
+  code,
+  label: countryLabel(code),
+})).sort((a, b) => a.label.localeCompare(b.label));
 
 export default function CartDrawer() {
   const { items, itemCount, subtotal, isOpen, closeCart, removeItem, setQuantity } = useCart();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [country, setCountry] = useState("");
+
+  // Remember the customer's chosen destination between visits.
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(COUNTRY_STORAGE_KEY);
+      if (saved) setCountry(saved);
+    } catch {
+      // ignore inaccessible storage
+    }
+  }, []);
+
+  function handleCountryChange(next: string) {
+    setCountry(next);
+    setCheckoutError(null);
+    try {
+      window.localStorage.setItem(COUNTRY_STORAGE_KEY, next);
+    } catch {
+      // ignore inaccessible storage
+    }
+  }
+
+  const quote = useMemo(
+    () => (country ? shippingQuote(country, itemCount) : null),
+    [country, itemCount]
+  );
+  const total = subtotal + (quote?.fee ?? 0);
 
   async function handleCheckout() {
+    if (!country) {
+      setCheckoutError("Please choose a shipping destination first.");
+      return;
+    }
     setCheckoutError(null);
     setIsCheckingOut(true);
     try {
@@ -21,6 +75,7 @@ export default function CartDrawer() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           items: items.map((i) => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity })),
+          countryCode: country,
         }),
       });
       const data = await res.json();
@@ -148,19 +203,60 @@ export default function CartDrawer() {
                 </ul>
 
                 <div className="border-t border-white/10 px-6 py-5">
-                  <div className="mb-4 flex items-center justify-between text-sm">
+                  <label
+                    htmlFor="ship-country"
+                    className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-white/60"
+                  >
+                    Shipping to
+                  </label>
+                  <select
+                    id="ship-country"
+                    value={country}
+                    onChange={(e) => handleCountryChange(e.target.value)}
+                    className="mb-4 w-full rounded-lg border border-white/15 bg-white/[0.06] px-3 py-2.5 text-sm text-white outline-none transition-colors focus:border-ember-400/60 [&>option]:bg-void-950"
+                  >
+                    <option value="" disabled>
+                      Select your country…
+                    </option>
+                    {COUNTRY_OPTIONS.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.label}
+                      </option>
+                    ))}
+                  </select>
+
+                  <div className="flex items-center justify-between text-sm">
                     <span className="text-white/60">Subtotal</span>
-                    <span className="text-base font-bold">{formatPrice(subtotal)}</span>
+                    <span className="font-semibold">{formatPrice(subtotal)}</span>
                   </div>
-                  <p className="mb-4 text-xs text-white/45">
-                    Shipping and any applicable taxes are calculated at checkout.
+                  <div className="mt-2 flex items-center justify-between text-sm">
+                    <span className="text-white/60">
+                      Shipping{quote ? ` (Zone ${quote.zone})` : ""}
+                    </span>
+                    <span className="font-semibold">
+                      {quote ? formatPrice(quote.fee) : "—"}
+                    </span>
+                  </div>
+
+                  <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-3">
+                    <span className="text-white/80">Total</span>
+                    <span className="text-lg font-bold">
+                      {quote ? formatPrice(total) : formatPrice(subtotal)}
+                    </span>
+                  </div>
+
+                  <p className="mb-4 mt-2 text-xs text-white/45">
+                    {quote
+                      ? "Shipping is included in the total above. Taxes, if any, are shown at checkout."
+                      : "Choose a destination to see your shipping fee."}
                   </p>
+
                   {checkoutError && (
                     <p className="mb-3 text-xs text-ember-300">{checkoutError}</p>
                   )}
                   <button
                     onClick={handleCheckout}
-                    disabled={isCheckingOut}
+                    disabled={isCheckingOut || !country}
                     className="w-full rounded-full bg-ember-500 py-3 text-center text-sm font-bold uppercase tracking-widest text-white transition-colors hover:bg-ember-400 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {isCheckingOut ? "Redirecting to checkout…" : "Checkout"}
