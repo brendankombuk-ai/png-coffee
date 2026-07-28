@@ -2,31 +2,26 @@ import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import TribalBackdrop from "@/components/TribalBackdrop";
 import ProductsHero from "@/components/ProductsHero";
-import ProductCategoryGrid from "@/components/ProductCategoryGrid";
+import CoffeeProductGrid from "@/components/CoffeeProductGrid";
 import ProductsValueAdded from "@/components/ProductsValueAdded";
 import Footer from "@/components/Footer";
 import { site } from "@/data/content";
-import {
-  getProductsHero,
-  getProductCategories,
-  getProductsValueAdded,
-} from "@/lib/cms/adapters";
+import { getProductsHero, getProductsValueAdded } from "@/lib/cms/adapters";
 
 export const metadata: Metadata = {
   title: "Our Coffee",
   description:
-    "PNG Coffee is grown in the pristine highlands of Papua New Guinea and available as whole beans, ground, drip coffee, and capsules.",
+    "PNG Coffee from the highlands of Papua New Guinea — Dark and Medium roast, beans or ground, in 350g bags. Buy in 3, 6 or 10-pack bundles.",
   openGraph: {
     title: `Our Coffee – ${site.name}`,
     description:
-      "PNG Coffee is grown in the pristine highlands of Papua New Guinea and available as whole beans, ground, drip coffee, and capsules.",
+      "PNG Coffee from the highlands of Papua New Guinea — Dark and Medium roast, beans or ground, in 350g bags.",
   },
 };
 
 export default async function ProductsPage() {
-  const [productsHero, productCategories, productsValueAdded] = await Promise.all([
+  const [productsHero, productsValueAdded] = await Promise.all([
     getProductsHero(),
-    getProductCategories(),
     getProductsValueAdded(),
   ]);
 
@@ -36,7 +31,7 @@ export default async function ProductsPage() {
       <TribalBackdrop src="/images/our-coffee.jpg" />
       <main id="main-content" className="relative">
         <ProductsHero productsHero={productsHero} />
-        <ProductCategoryGrid productCategories={productCategories} />
+        <CoffeeProductGrid />
         <ProductsValueAdded productsValueAdded={productsValueAdded} />
       </main>
       <Footer />

@@ -7,18 +7,18 @@ import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
 import { useCart } from "@/lib/cart/CartContext";
 import { useZone } from "@/lib/zone/ZoneContext";
 import { formatPrice } from "@/lib/cart/currency";
-import { ZONE_LABELS } from "@/lib/shipping/zones";
+import { getZone, gstApplies } from "@/lib/shipping/zones";
 import ZoneSelector from "./ZoneSelector";
 
 export default function CartDrawer() {
-  const { items, itemCount, subtotal, isOpen, closeCart, removeItem, setQuantity } = useCart();
+  const { items, itemCount, bagCount, quote, isOpen, closeCart, removeItem, setQuantity } = useCart();
   const { zone } = useZone();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   async function handleCheckout() {
     if (!zone) {
-      setCheckoutError("Please choose your postal zone first.");
+      setCheckoutError("Please choose your shipping destination first.");
       return;
     }
     setCheckoutError(null);
@@ -29,18 +29,11 @@ export default function CartDrawer() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           zone,
-          items: items.map((i) => ({
-            id: i.id,
-            name: i.name,
-            bundleTier: i.bundleTier,
-            quantity: i.quantity,
-          })),
+          items: items.map((i) => ({ productId: i.productId, size: i.size, quantity: i.quantity })),
         }),
       });
       const data = await res.json();
-      if (!res.ok || !data.url) {
-        throw new Error(data.error || "Could not start checkout. Please try again.");
-      }
+      if (!res.ok || !data.url) throw new Error(data.error || "Could not start checkout. Please try again.");
       window.location.href = data.url;
     } catch (err) {
       setCheckoutError(err instanceof Error ? err.message : "Something went wrong.");
@@ -61,7 +54,6 @@ export default function CartDrawer() {
             onClick={closeCart}
             aria-hidden="true"
           />
-
           <motion.aside
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
@@ -76,11 +68,7 @@ export default function CartDrawer() {
               <h2 className="font-display text-lg font-extrabold uppercase tracking-wide">
                 Your Cart {itemCount > 0 && <span className="text-white/50">({itemCount})</span>}
               </h2>
-              <button
-                aria-label="Close cart"
-                onClick={closeCart}
-                className="text-white/70 transition-colors hover:text-white"
-              >
+              <button aria-label="Close cart" onClick={closeCart} className="text-white/70 transition-colors hover:text-white">
                 <X size={22} />
               </button>
             </div>
@@ -100,26 +88,16 @@ export default function CartDrawer() {
               <>
                 <ul className="flex-1 space-y-4 overflow-y-auto px-6 py-5">
                   {items.map((item) => (
-                    <li
-                      key={item.id}
-                      className="flex gap-4 rounded-xl border border-white/10 bg-white/[0.04] p-3"
-                    >
+                    <li key={item.id} className="flex gap-4 rounded-xl border border-white/10 bg-white/[0.04] p-3">
                       <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-white/5">
                         {item.image ? (
-                          <Image
-                            src={item.image}
-                            alt={item.name}
-                            fill
-                            sizes="80px"
-                            className="object-contain p-1.5"
-                          />
+                          <Image src={item.image} alt={item.name} fill sizes="80px" className="object-contain p-1.5" />
                         ) : (
                           <div className="flex h-full w-full items-center justify-center">
                             <ShoppingBag size={20} className="text-white/20" />
                           </div>
                         )}
                       </div>
-
                       <div className="flex flex-1 flex-col justify-between">
                         <div className="flex items-start justify-between gap-2">
                           <p className="text-sm font-semibold leading-snug">{item.name}</p>
@@ -131,29 +109,18 @@ export default function CartDrawer() {
                             <Trash2 size={15} />
                           </button>
                         </div>
-
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2 rounded-full border border-white/15 px-1.5 py-1">
-                            <button
-                              aria-label="Decrease quantity"
-                              onClick={() => setQuantity(item.id, item.quantity - 1)}
-                              className="text-white/70 transition-colors hover:text-white"
-                            >
+                            <button aria-label="Decrease quantity" onClick={() => setQuantity(item.id, item.quantity - 1)} className="text-white/70 transition-colors hover:text-white">
                               <Minus size={13} />
                             </button>
-                            <span className="w-4 text-center text-xs font-medium">
-                              {item.quantity}
-                            </span>
-                            <button
-                              aria-label="Increase quantity"
-                              onClick={() => setQuantity(item.id, item.quantity + 1)}
-                              className="text-white/70 transition-colors hover:text-white"
-                            >
+                            <span className="w-4 text-center text-xs font-medium">{item.quantity}</span>
+                            <button aria-label="Increase quantity" onClick={() => setQuantity(item.id, item.quantity + 1)} className="text-white/70 transition-colors hover:text-white">
                               <Plus size={13} />
                             </button>
                           </div>
                           <span className="text-sm font-semibold text-white/90">
-                            {formatPrice(item.price * item.quantity)}
+                            {formatPrice(item.unitPrice * item.quantity)}
                           </span>
                         </div>
                       </div>
@@ -162,26 +129,41 @@ export default function CartDrawer() {
                 </ul>
 
                 <div className="border-t border-white/10 px-6 py-5">
-                  {/* Zone drives bundle pricing; prices already include EMS postage. */}
                   <div className="mb-4">
                     <ZoneSelector compact />
                   </div>
 
-                  <div className="mb-1 flex items-center justify-between">
-                    <span className="text-white/80">Total</span>
-                    <span className="text-lg font-bold">{formatPrice(subtotal)}</span>
+                  <div className="space-y-1.5 text-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="text-white/60">Subtotal ({bagCount} × 350g bags)</span>
+                      <span className="font-semibold">{formatPrice(quote.subtotal)}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-white/60">Shipping{zone ? ` — ${getZone(zone).label}` : ""}</span>
+                      <span className="font-semibold">{zone ? formatPrice(quote.shipping) : "—"}</span>
+                    </div>
+                    {zone && gstApplies(zone) && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-white/60">GST</span>
+                        <span className="font-semibold">{formatPrice(quote.gst)}</span>
+                      </div>
+                    )}
                   </div>
-                  <p className="mb-4 text-xs text-white/45">
-                    {zone
-                      ? `Shipping to ${ZONE_LABELS[zone].name} — EMS postage included. Coupons applied at checkout.`
-                      : "Choose your postal zone to confirm pricing."}
-                  </p>
 
-                  {checkoutError && <p className="mb-3 text-xs text-ember-300">{checkoutError}</p>}
+                  <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-3">
+                    <span className="text-white/80">Total</span>
+                    <span className="text-lg font-bold">{formatPrice(quote.total)}</span>
+                  </div>
+
+                  {!zone && (
+                    <p className="mt-2 text-xs text-white/45">Choose your destination to see shipping and the total.</p>
+                  )}
+                  {checkoutError && <p className="mt-3 text-xs text-ember-300">{checkoutError}</p>}
+
                   <button
                     onClick={handleCheckout}
                     disabled={isCheckingOut || !zone}
-                    className="w-full rounded-full bg-ember-500 py-3 text-center text-sm font-bold uppercase tracking-widest text-white transition-colors hover:bg-ember-400 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="mt-4 w-full rounded-full bg-ember-500 py-3 text-center text-sm font-bold uppercase tracking-widest text-white transition-colors hover:bg-ember-400 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {isCheckingOut ? "Redirecting to checkout…" : "Checkout"}
                   </button>

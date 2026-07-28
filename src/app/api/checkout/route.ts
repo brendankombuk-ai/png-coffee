@@ -3,35 +3,28 @@ import type Stripe from "stripe";
 import { stripe } from "@/lib/stripe/client";
 import { CURRENCY, toStripeAmount } from "@/lib/cart/currency";
 import {
-  bundlePrice,
-  isBundleTier,
-  isZone,
+  getProduct,
+  quoteOrder,
   zoneAllowedCountries,
+  isZoneId,
+  isBundleSize,
+  getZone,
+  type QuoteLine,
 } from "@/lib/shipping/zones";
 
-type CheckoutRequestItem = {
-  id: string;
-  name: string;
-  bundleTier: number;
-  quantity: number;
-};
+type ReqItem = { productId: string; size: number; quantity: number };
 
 export async function POST(req: NextRequest) {
-  let body: { items?: CheckoutRequestItem[]; zone?: number };
+  let body: { items?: ReqItem[]; zone?: string };
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
 
-  // Zone is required — it determines the all-in bundle price and the countries
-  // the customer is allowed to ship to.
   const zone = body.zone;
-  if (!isZone(zone)) {
-    return NextResponse.json(
-      { error: "Please choose your postal zone before checking out." },
-      { status: 400 }
-    );
+  if (!isZoneId(zone)) {
+    return NextResponse.json({ error: "Please choose your shipping destination." }, { status: 400 });
   }
 
   const items = body.items;
@@ -39,29 +32,54 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Your cart is empty." }, { status: 400 });
   }
 
-  // Validate each line and price it SERVER-SIDE from the zone + bundle tier —
-  // never trust an amount sent from the browser for anything touching money.
-  const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
+  // Validate + build quote lines server-side (never trust prices from the browser).
+  const lines: QuoteLine[] = [];
+  const productLineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
   for (const item of items) {
+    const product = getProduct(item.productId);
     if (
-      typeof item.id !== "string" ||
-      typeof item.name !== "string" ||
-      !isBundleTier(item.bundleTier) ||
+      !product ||
+      !isBundleSize(item.size) ||
       typeof item.quantity !== "number" ||
       item.quantity <= 0 ||
       item.quantity > 99
     ) {
       return NextResponse.json({ error: "Invalid item in cart." }, { status: 400 });
     }
-    line_items.push({
+    lines.push({ productId: product.id, size: item.size, quantity: item.quantity });
+    productLineItems.push({
       quantity: item.quantity,
       price_data: {
         currency: CURRENCY.toLowerCase(),
-        unit_amount: toStripeAmount(bundlePrice(zone, item.bundleTier)),
+        unit_amount: toStripeAmount(product.bundles[item.size].price),
         product_data: {
-          name: item.name,
-          metadata: { productId: item.id, bundleTier: String(item.bundleTier), zone: String(zone) },
+          name: `${product.name} · ${item.size}-Pack (${item.size} × 350g)`,
+          metadata: { productId: product.id, size: String(item.size), sku: product.bundles[item.size].sku },
         },
+      },
+    });
+  }
+
+  const { shipping, gst } = quoteOrder(zone, lines);
+
+  // Shipping + GST as their own line items.
+  if (shipping > 0) {
+    productLineItems.push({
+      quantity: 1,
+      price_data: {
+        currency: CURRENCY.toLowerCase(),
+        unit_amount: toStripeAmount(shipping),
+        product_data: { name: `Shipping — ${getZone(zone).label}`, metadata: { kind: "shipping", zone } },
+      },
+    });
+  }
+  if (gst > 0) {
+    productLineItems.push({
+      quantity: 1,
+      price_data: {
+        currency: CURRENCY.toLowerCase(),
+        unit_amount: toStripeAmount(gst),
+        product_data: { name: "GST (10%)", metadata: { kind: "gst", zone } },
       },
     });
   }
@@ -74,12 +92,10 @@ export async function POST(req: NextRequest) {
   try {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
-      line_items,
-      // Bundle prices already include EMS postage, so no separate shipping line.
+      line_items: productLineItems,
+      phone_number_collection: { enabled: true },
       shipping_address_collection: { allowed_countries: allowedCountries },
-      // Voucher / coupon support (Stripe promotion codes).
       allow_promotion_codes: true,
-      // Optional order note from the customer.
       custom_fields: [
         {
           key: "ordernote",
@@ -93,19 +109,12 @@ export async function POST(req: NextRequest) {
     });
 
     if (!session.url) {
-      return NextResponse.json(
-        { error: "Stripe did not return a checkout URL." },
-        { status: 502 }
-      );
+      return NextResponse.json({ error: "Stripe did not return a checkout URL." }, { status: 502 });
     }
-
     return NextResponse.json({ url: session.url });
   } catch (err) {
     console.error("[checkout] Stripe session creation failed:", err);
-    const message =
-      err instanceof Error
-        ? err.message
-        : "Could not start checkout. Please try again in a moment.";
+    const message = err instanceof Error ? err.message : "Could not start checkout. Please try again.";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

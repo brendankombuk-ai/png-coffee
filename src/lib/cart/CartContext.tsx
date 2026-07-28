@@ -10,14 +10,18 @@ import {
   type ReactNode,
 } from "react";
 import type { CartItem } from "./types";
-import { bundlePrice, type Zone } from "@/lib/shipping/zones";
+import { useZone } from "@/lib/zone/ZoneContext";
+import { quoteOrder, type OrderQuote } from "@/lib/shipping/zones";
 
 const STORAGE_KEY = "png-coffee-cart";
 
 type CartContextValue = {
   items: CartItem[];
   itemCount: number;
-  subtotal: number;
+  /** Total number of 350g bags across the cart. */
+  bagCount: number;
+  /** Order maths for the current zone (subtotal/shipping/gst/total). */
+  quote: OrderQuote;
   isOpen: boolean;
   openCart: () => void;
   closeCart: () => void;
@@ -25,40 +29,33 @@ type CartContextValue = {
   removeItem: (id: string) => void;
   setQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
-  /** Re-price every bundle line for a newly-chosen zone. */
-  repriceBundles: (zone: Zone) => void;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
+  const { zone } = useZone();
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
-  // Load persisted cart on mount (client-only — localStorage isn't available
-  // during server rendering).
   useEffect(() => {
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) setItems(JSON.parse(raw));
     } catch {
-      // Corrupted or inaccessible storage — start with an empty cart rather
-      // than crashing the page.
+      // start empty on corrupted storage
     } finally {
       setHydrated(true);
     }
   }, []);
 
-  // Persist on every change, once initial hydration has happened (avoids
-  // overwriting a saved cart with an empty one on first render).
   useEffect(() => {
     if (!hydrated) return;
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
     } catch {
-      // Storage full or unavailable (e.g. private browsing) — cart still
-      // works for the current session, it just won't persist.
+      // storage unavailable — cart still works this session
     }
   }, [items, hydrated]);
 
@@ -90,24 +87,31 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const openCart = useCallback(() => setIsOpen(true), []);
   const closeCart = useCallback(() => setIsOpen(false), []);
 
-  const repriceBundles = useCallback((zone: Zone) => {
-    setItems((prev) =>
-      prev.map((i) =>
-        i.bundleTier ? { ...i, price: bundlePrice(zone, i.bundleTier) } : i
-      )
-    );
-  }, []);
-
-  const itemCount = useMemo(() => items.reduce((sum, i) => sum + i.quantity, 0), [items]);
-  const subtotal = useMemo(
-    () => items.reduce((sum, i) => sum + i.price * i.quantity, 0),
+  const itemCount = useMemo(() => items.reduce((s, i) => s + i.quantity, 0), [items]);
+  const bagCount = useMemo(
+    () => items.reduce((s, i) => s + i.size * i.quantity, 0),
     [items]
   );
+
+  // Order maths re-derive whenever items OR zone change (so shipping/GST update
+  // automatically when the customer switches zone). Falls back to a goods-only
+  // subtotal until a zone is chosen.
+  const quote = useMemo<OrderQuote>(() => {
+    if (!zone) {
+      const subtotal = items.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
+      return { subtotal: Math.round(subtotal * 100) / 100, shipping: 0, gst: 0, total: Math.round(subtotal * 100) / 100 };
+    }
+    return quoteOrder(
+      zone,
+      items.map((i) => ({ productId: i.productId, size: i.size, quantity: i.quantity }))
+    );
+  }, [items, zone]);
 
   const value: CartContextValue = {
     items,
     itemCount,
-    subtotal,
+    bagCount,
+    quote,
     isOpen,
     openCart,
     closeCart,
@@ -115,7 +119,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
     removeItem,
     setQuantity,
     clearCart,
-    repriceBundles,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
