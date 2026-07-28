@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { staggerContainer } from "@/lib/animations";
 import ProductCard from "./ProductCard";
+import ZoneSelector from "./ZoneSelector";
 import type { ProductPlaceholder } from "@/data/content";
 
 export default function ProductGrid({
@@ -12,8 +13,15 @@ export default function ProductGrid({
   products: ProductPlaceholder[];
   categorySlug?: string;
 }) {
+  const hasOnline = products.some((p) => p.soldOnline);
+
   return (
     <section className="relative z-10 mx-auto max-w-[1400px] px-6 pb-[100px] sm:px-10">
+      {hasOnline && (
+        <div className="mb-10">
+          <ZoneSelector />
+        </div>
+      )}
       <motion.div
         variants={staggerContainer}
         initial="hidden"

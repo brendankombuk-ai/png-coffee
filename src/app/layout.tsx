@@ -3,6 +3,7 @@ import { Archivo, Inter } from "next/font/google";
 import "@/styles/globals.css";
 import SmoothScrollProvider from "@/components/SmoothScrollProvider";
 import { CartProvider } from "@/lib/cart/CartContext";
+import { ZoneProvider } from "@/lib/zone/ZoneContext";
 import CartDrawer from "@/components/CartDrawer";
 import { site } from "@/data/content";
 
@@ -71,10 +72,12 @@ export default function RootLayout({
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
-        <CartProvider>
-          <SmoothScrollProvider>{children}</SmoothScrollProvider>
-          <CartDrawer />
-        </CartProvider>
+        <ZoneProvider>
+          <CartProvider>
+            <SmoothScrollProvider>{children}</SmoothScrollProvider>
+            <CartDrawer />
+          </CartProvider>
+        </ZoneProvider>
       </body>
     </html>
   );

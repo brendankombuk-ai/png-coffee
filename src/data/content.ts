@@ -680,11 +680,18 @@ export type ProductPlaceholder = {
   id: string;
   name: string;
   description: string;
-  /** Price in whole currency units (e.g. 14.99), not cents. See NEXT_PUBLIC_CURRENCY in .env. */
+  /** Price in whole currency units (e.g. 14.99), not cents. See NEXT_PUBLIC_CURRENCY in .env.
+   *  NOTE: ignored for online bundle products — their price comes from the zone bundle grid. */
   price: number;
   /** Optional real product photo (transparent PNG cutout). Falls back to a placeholder icon when absent. */
   image?: string;
   alt?: string;
+  /** When true, this product is sold online as 3/6/10-packet bundles priced by
+   *  zone (see src/lib/shipping/zones.ts). When false/absent it's display-only:
+   *  the card shows no price and no "Add to Cart" button. */
+  soldOnline?: boolean;
+  /** Optional grind choices for an online product, e.g. ["Whole Beans", "Ground"]. */
+  grindOptions?: string[];
 };
 
 export type ProductCategoryPageData = {
@@ -739,12 +746,18 @@ export const productCategoryPages: Record<string, ProductCategoryPageData> = {
       },
       {
         id: "arabica-medium-roast",
-        name: "Arabica Coffee – Medium Roast",
+        name: "Papua New Guinea Arabica Coffee",
         description:
-          "Wild, naturally organic Arabica whole beans, medium roast, 250g bag.",
+          "Wild, naturally organic Arabica, medium roast. Sold in 3, 6 or 10 × 220g packets — price includes EMS postage.",
         price: 16.99,
         image: "/images/products/whole-beans/arabica-medium-roast.png",
-        alt: "PNG Coffee wild organic Arabica whole bean 250g bag, medium roast",
+        alt: "PNG Coffee wild organic Arabica whole bean bag, medium roast",
+        // Worked online example. Add `soldOnline: true` (and optional
+        // grindOptions) to any product you want sold online; everything else
+        // stays display-only (no price, no Add to Cart). Swap these in once you
+        // send the final list of online products.
+        soldOnline: true,
+        grindOptions: ["Whole Beans", "Ground"],
       },
     ],
   },

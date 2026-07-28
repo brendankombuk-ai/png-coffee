@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import type { CartItem } from "./types";
+import { bundlePrice, type Zone } from "@/lib/shipping/zones";
 
 const STORAGE_KEY = "png-coffee-cart";
 
@@ -24,6 +25,8 @@ type CartContextValue = {
   removeItem: (id: string) => void;
   setQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
+  /** Re-price every bundle line for a newly-chosen zone. */
+  repriceBundles: (zone: Zone) => void;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -87,6 +90,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const openCart = useCallback(() => setIsOpen(true), []);
   const closeCart = useCallback(() => setIsOpen(false), []);
 
+  const repriceBundles = useCallback((zone: Zone) => {
+    setItems((prev) =>
+      prev.map((i) =>
+        i.bundleTier ? { ...i, price: bundlePrice(zone, i.bundleTier) } : i
+      )
+    );
+  }, []);
+
   const itemCount = useMemo(() => items.reduce((sum, i) => sum + i.quantity, 0), [items]);
   const subtotal = useMemo(
     () => items.reduce((sum, i) => sum + i.price * i.quantity, 0),
@@ -104,6 +115,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     removeItem,
     setQuantity,
     clearCart,
+    repriceBundles,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
