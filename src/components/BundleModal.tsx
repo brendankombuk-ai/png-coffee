@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, Minus, Plus, ShoppingCart, X } from "lucide-react";
@@ -30,8 +31,11 @@ export default function BundleModal({
   const [size, setSize] = useState<BundleSize>(6);
   const [qty, setQty] = useState(1);
   const [justAdded, setJustAdded] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  if (!product) return null;
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted || !product) return null;
 
   const bundle = product.bundles[size];
   const weightG = bundleWeightGrams(size);
@@ -60,16 +64,16 @@ export default function BundleModal({
     }, 900);
   }
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {open && (
-        <>
+        <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[1200] bg-black/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/75 backdrop-blur-sm"
             onClick={onClose}
             aria-hidden="true"
           />
@@ -81,7 +85,7 @@ export default function BundleModal({
             role="dialog"
             aria-modal="true"
             aria-label={`Choose a bundle for ${product.name}`}
-            className="fixed left-1/2 top-1/2 z-[1201] flex max-h-[92vh] w-[min(560px,94vw)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-3xl border border-ember-500/25 bg-void-950/95 text-white shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)] backdrop-blur-xl"
+            className="relative z-[1201] flex max-h-[90vh] w-[min(560px,94vw)] flex-col overflow-hidden rounded-3xl border border-ember-500/25 bg-void-950 text-white shadow-[0_30px_80px_-20px_rgba(0,0,0,0.85)]"
           >
             <div className="flex items-start justify-between gap-4 border-b border-white/10 p-5">
               <div className="flex items-center gap-4">
@@ -184,9 +188,10 @@ export default function BundleModal({
               </button>
             </div>
           </motion.div>
-        </>
+        </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }
 
