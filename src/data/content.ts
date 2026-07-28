@@ -889,7 +889,7 @@ export const contactPage: ContactPageContent = {
   ],
   businessHours: [
     { day: "Monday – Friday", hours: "8:00 AM – 5:00 PM" },
-    { day: "Saturday", hours: "9:00 AM – 1:00 PM" },
+    { day: "Saturday", hours: "8:00 AM – 12:00 PM" },
     { day: "Sunday", hours: "Closed" },
   ],
   socialLinks: [
