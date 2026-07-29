@@ -11,8 +11,8 @@ import { formatPrice } from "@/lib/cart/currency";
 import ZoneSelector from "./ZoneSelector";
 import {
   BUNDLE_SIZES,
+  bundlePrice,
   bundleWeightGrams,
-  shippingRate,
   type BundleSize,
   type CoffeeProduct,
 } from "@/lib/shipping/zones";
@@ -34,12 +34,11 @@ export default function BundleModal({
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
-
   if (!mounted || !product) return null;
 
   const bundle = product.bundles[size];
   const weightG = bundleWeightGrams(size);
-  const shipping = zone ? shippingRate(zone, size) : null;
+  const price = zone ? bundlePrice(zone, size) : null;
   const inStock = bundle.stock > 0;
 
   function handleAdd() {
@@ -52,7 +51,6 @@ export default function BundleModal({
         roast: product.roast,
         grind: product.grind,
         size,
-        unitPrice: bundle.price,
         image: product.image,
       },
       qty
@@ -109,7 +107,6 @@ export default function BundleModal({
                 </div>
               )}
 
-              {/* Bundle size */}
               <div>
                 <p className="mb-2 text-xs font-bold uppercase tracking-widest text-white/55">Bundle size</p>
                 <div className="grid grid-cols-3 gap-2">
@@ -120,9 +117,7 @@ export default function BundleModal({
                       onClick={() => setSize(s)}
                       aria-pressed={size === s}
                       className={`rounded-xl border px-2 py-3 text-center transition-colors ${
-                        size === s
-                          ? "border-ember-400/70 bg-ember-500/20"
-                          : "border-white/12 bg-white/[0.04] hover:border-ember-400/40"
+                        size === s ? "border-ember-400/70 bg-ember-500/20" : "border-white/12 bg-white/[0.04] hover:border-ember-400/40"
                       }`}
                     >
                       <span className="block text-base font-bold">{s}-Pack</span>
@@ -132,23 +127,16 @@ export default function BundleModal({
                 </div>
               </div>
 
-              {/* Dynamic details */}
               <dl className="space-y-2 rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm">
-                <Row label="Bundle price"><span className="font-bold">{formatPrice(bundle.price)}</span></Row>
-                <Row label="Total weight">{(weightG / 1000).toFixed(2)} kg</Row>
-                <Row label="Shipping">
-                  {shipping !== null ? formatPrice(shipping) : <span className="text-ember-200">select a zone</span>}
+                <Row label="Price (incl. postage)">
+                  {price !== null ? <span className="font-bold">{formatPrice(price)}</span> : <span className="text-ember-200">select a zone</span>}
                 </Row>
+                <Row label="Total weight">{(weightG / 1000).toFixed(2)} kg</Row>
                 <Row label="Availability">
-                  {inStock ? (
-                    <span className="text-emerald-300">In stock</span>
-                  ) : (
-                    <span className="text-ember-300">Out of stock</span>
-                  )}
+                  {inStock ? <span className="text-emerald-300">In stock</span> : <span className="text-ember-300">Out of stock</span>}
                 </Row>
               </dl>
 
-              {/* Quantity */}
               <div className="flex items-center justify-between">
                 <p className="text-xs font-bold uppercase tracking-widest text-white/55">Quantity</p>
                 <div className="flex items-center gap-3 rounded-full border border-white/15 px-2 py-1">
@@ -163,8 +151,7 @@ export default function BundleModal({
               </div>
             </div>
 
-            {/* Sticky add-to-cart */}
-            <div className="border-t border-white/10 bg-void-950/95 p-5">
+            <div className="border-t border-white/10 bg-void-950 p-5">
               <button
                 type="button"
                 onClick={handleAdd}
@@ -172,18 +159,13 @@ export default function BundleModal({
                 className="flex w-full items-center justify-center gap-2 rounded-full bg-ember-500 py-3.5 text-sm font-bold uppercase tracking-widest text-white transition-colors hover:bg-ember-400 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {justAdded ? (
-                  <>
-                    <Check className="h-4 w-4" strokeWidth={2.5} /> Added to cart
-                  </>
+                  <><Check className="h-4 w-4" strokeWidth={2.5} /> Added to cart</>
                 ) : !zone ? (
                   "Select a shipping zone first"
                 ) : !inStock ? (
                   "Out of stock"
                 ) : (
-                  <>
-                    <ShoppingCart className="h-4 w-4" strokeWidth={2} />
-                    Add {qty} × {size}-Pack — {formatPrice(bundle.price * qty)}
-                  </>
+                  <><ShoppingCart className="h-4 w-4" strokeWidth={2} /> Add {qty} × {size}-Pack — {formatPrice((price ?? 0) * qty)}</>
                 )}
               </button>
             </div>

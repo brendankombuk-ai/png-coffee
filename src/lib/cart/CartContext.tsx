@@ -93,14 +93,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     [items]
   );
 
-  // Order maths re-derive whenever items OR zone change (so shipping/GST update
-  // automatically when the customer switches zone). Falls back to a goods-only
-  // subtotal until a zone is chosen.
+  // All-in total for the chosen zone (prices already include postage). No zone
+  // yet → total 0 (the UI prompts the customer to pick a zone first).
   const quote = useMemo<OrderQuote>(() => {
-    if (!zone) {
-      const subtotal = items.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
-      return { subtotal: Math.round(subtotal * 100) / 100, shipping: 0, gst: 0, total: Math.round(subtotal * 100) / 100 };
-    }
+    if (!zone) return { total: 0 };
     return quoteOrder(
       zone,
       items.map((i) => ({ productId: i.productId, size: i.size, quantity: i.quantity }))

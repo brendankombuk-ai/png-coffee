@@ -8,8 +8,6 @@ export type CartItem = {
   roast: Roast;
   grind: Grind;
   size: BundleSize;
-  /** Product-only bundle price (shipping + GST are added at the order level). */
-  unitPrice: number;
   image?: string;
   quantity: number;
 };

@@ -4,12 +4,10 @@ import { stripe } from "@/lib/stripe/client";
 import { CURRENCY, toStripeAmount } from "@/lib/cart/currency";
 import {
   getProduct,
-  quoteOrder,
+  bundlePrice,
   zoneAllowedCountries,
   isZoneId,
   isBundleSize,
-  getZone,
-  type QuoteLine,
 } from "@/lib/shipping/zones";
 
 type ReqItem = { productId: string; size: number; quantity: number };
@@ -24,7 +22,7 @@ export async function POST(req: NextRequest) {
 
   const zone = body.zone;
   if (!isZoneId(zone)) {
-    return NextResponse.json({ error: "Please choose your shipping destination." }, { status: 400 });
+    return NextResponse.json({ error: "Please choose your postal zone." }, { status: 400 });
   }
 
   const items = body.items;
@@ -32,9 +30,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Your cart is empty." }, { status: 400 });
   }
 
-  // Validate + build quote lines server-side (never trust prices from the browser).
-  const lines: QuoteLine[] = [];
-  const productLineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
+  // Price every line server-side from the zone grid (all-in — postage included).
+  const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
   for (const item of items) {
     const product = getProduct(item.productId);
     if (
@@ -46,40 +43,15 @@ export async function POST(req: NextRequest) {
     ) {
       return NextResponse.json({ error: "Invalid item in cart." }, { status: 400 });
     }
-    lines.push({ productId: product.id, size: item.size, quantity: item.quantity });
-    productLineItems.push({
+    line_items.push({
       quantity: item.quantity,
       price_data: {
         currency: CURRENCY.toLowerCase(),
-        unit_amount: toStripeAmount(product.bundles[item.size].price),
+        unit_amount: toStripeAmount(bundlePrice(zone, item.size)),
         product_data: {
           name: `${product.name} · ${item.size}-Pack (${item.size} × 350g)`,
-          metadata: { productId: product.id, size: String(item.size), sku: product.bundles[item.size].sku },
+          metadata: { productId: product.id, size: String(item.size), sku: product.bundles[item.size].sku, zone },
         },
-      },
-    });
-  }
-
-  const { shipping, gst } = quoteOrder(zone, lines);
-
-  // Shipping + GST as their own line items.
-  if (shipping > 0) {
-    productLineItems.push({
-      quantity: 1,
-      price_data: {
-        currency: CURRENCY.toLowerCase(),
-        unit_amount: toStripeAmount(shipping),
-        product_data: { name: `Shipping — ${getZone(zone).label}`, metadata: { kind: "shipping", zone } },
-      },
-    });
-  }
-  if (gst > 0) {
-    productLineItems.push({
-      quantity: 1,
-      price_data: {
-        currency: CURRENCY.toLowerCase(),
-        unit_amount: toStripeAmount(gst),
-        product_data: { name: "GST (10%)", metadata: { kind: "gst", zone } },
       },
     });
   }
@@ -92,7 +64,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
-      line_items: productLineItems,
+      line_items,
       phone_number_collection: { enabled: true },
       shipping_address_collection: { allowed_countries: allowedCountries },
       allow_promotion_codes: true,

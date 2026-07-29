@@ -5,13 +5,15 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { staggerContainer, cardReveal } from "@/lib/animations";
 import { formatPrice } from "@/lib/cart/currency";
+import { useZone } from "@/lib/zone/ZoneContext";
 import ZoneSelector from "./ZoneSelector";
 import BundleModal from "./BundleModal";
-import { PRODUCTS, type CoffeeProduct } from "@/lib/shipping/zones";
+import { PRODUCTS, bundlePrice, type CoffeeProduct } from "@/lib/shipping/zones";
 
 export default function CoffeeProductGrid() {
   const [active, setActive] = useState<CoffeeProduct | null>(null);
   const [open, setOpen] = useState(false);
+  const { zone } = useZone();
 
   function selectBundle(product: CoffeeProduct) {
     setActive(product);
@@ -59,7 +61,11 @@ export default function CoffeeProductGrid() {
               </p>
               <p className="mt-2 flex-1 text-sm leading-relaxed text-white/65">{product.description}</p>
               <p className="mt-3 text-sm text-white/70">
-                From <span className="font-display text-lg font-bold text-white">{formatPrice(product.bundles[3].price)}</span>
+                {zone ? (
+                  <>From <span className="font-display text-lg font-bold text-white">{formatPrice(bundlePrice(zone, 3))}</span></>
+                ) : (
+                  <span className="text-white/45">Select a zone for pricing</span>
+                )}
               </p>
               <button
                 type="button"

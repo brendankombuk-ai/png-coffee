@@ -7,7 +7,7 @@ import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
 import { useCart } from "@/lib/cart/CartContext";
 import { useZone } from "@/lib/zone/ZoneContext";
 import { formatPrice } from "@/lib/cart/currency";
-import { getZone, gstApplies } from "@/lib/shipping/zones";
+import { bundlePrice, getZone } from "@/lib/shipping/zones";
 import ZoneSelector from "./ZoneSelector";
 
 export default function CartDrawer() {
@@ -120,7 +120,7 @@ export default function CartDrawer() {
                             </button>
                           </div>
                           <span className="text-sm font-semibold text-white/90">
-                            {formatPrice(item.unitPrice * item.quantity)}
+                            {zone ? formatPrice(bundlePrice(zone, item.size) * item.quantity) : "—"}
                           </span>
                         </div>
                       </div>
@@ -133,31 +133,18 @@ export default function CartDrawer() {
                     <ZoneSelector compact />
                   </div>
 
-                  <div className="space-y-1.5 text-sm">
-                    <div className="flex items-center justify-between">
-                      <span className="text-white/60">Subtotal ({bagCount} × 350g bags)</span>
-                      <span className="font-semibold">{formatPrice(quote.subtotal)}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-white/60">Shipping{zone ? ` — ${getZone(zone).label}` : ""}</span>
-                      <span className="font-semibold">{zone ? formatPrice(quote.shipping) : "—"}</span>
-                    </div>
-                    {zone && gstApplies(zone) && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-white/60">GST</span>
-                        <span className="font-semibold">{formatPrice(quote.gst)}</span>
-                      </div>
-                    )}
+                  <div className="flex items-center justify-between">
+                    <span className="text-white/80">
+                      Total {zone ? `— ${getZone(zone).label}` : ""}
+                    </span>
+                    <span className="text-lg font-bold">{zone ? formatPrice(quote.total) : "—"}</span>
                   </div>
+                  <p className="mt-2 text-xs text-white/45">
+                    {zone
+                      ? `${bagCount} × 350g bags · US$ · postage included.`
+                      : "Choose your zone to see pricing (postage is included in the price)."}
+                  </p>
 
-                  <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-3">
-                    <span className="text-white/80">Total</span>
-                    <span className="text-lg font-bold">{formatPrice(quote.total)}</span>
-                  </div>
-
-                  {!zone && (
-                    <p className="mt-2 text-xs text-white/45">Choose your destination to see shipping and the total.</p>
-                  )}
                   {checkoutError && <p className="mt-3 text-xs text-ember-300">{checkoutError}</p>}
 
                   <button
