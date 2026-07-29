@@ -62,8 +62,8 @@ export function zoneAllowedCountries(id: ZoneId): string[] {
 export type BundleSize = 3 | 6 | 10;
 export const BUNDLE_SIZES: BundleSize[] = [3, 6, 10];
 
-/** Grams per bag. All coffee is packed in 350g bags. */
-export const BAG_GRAMS = 350;
+/** Grams per bag. All coffee is packed in 250g bags. */
+export const BAG_GRAMS = 250;
 
 export function bundleWeightGrams(size: BundleSize): number {
   return size * BAG_GRAMS;
@@ -110,9 +110,9 @@ export const PRODUCTS: CoffeeProduct[] = [
     name: "Dark Roast – Beans",
     roast: "Dark Roast",
     grind: "Beans",
-    description: "Rich, bold dark roast whole beans from the PNG highlands. Packed in 350g bags.",
+    description: "Rich, bold dark roast whole beans from the PNG highlands. Packed in 250g bags.",
     image: "/images/products/coffee/dark-roast-beans.jpg",
-    alt: "PNG Coffee Dark Roast whole beans 350g bag",
+    alt: "PNG Coffee Dark Roast whole beans 250g bag",
     bundles: { 3: { sku: "DRB-3", stock: 100 }, 6: { sku: "DRB-6", stock: 100 }, 10: { sku: "DRB-10", stock: 100 } },
     featured: true,
   },
@@ -121,9 +121,9 @@ export const PRODUCTS: CoffeeProduct[] = [
     name: "Dark Roast – Ground",
     roast: "Dark Roast",
     grind: "Ground",
-    description: "Rich, bold dark roast, freshly ground. Packed in 350g bags.",
+    description: "Rich, bold dark roast, freshly ground. Packed in 250g bags.",
     image: "/images/products/coffee/dark-roast-ground.jpg",
-    alt: "PNG Coffee Dark Roast ground 350g bag",
+    alt: "PNG Coffee Dark Roast ground 250g bag",
     bundles: { 3: { sku: "DRG-3", stock: 100 }, 6: { sku: "DRG-6", stock: 100 }, 10: { sku: "DRG-10", stock: 100 } },
   },
   {
@@ -131,9 +131,9 @@ export const PRODUCTS: CoffeeProduct[] = [
     name: "Medium Roast – Beans",
     roast: "Medium Roast",
     grind: "Beans",
-    description: "Smooth, balanced medium roast whole beans. Packed in 350g bags.",
+    description: "Smooth, balanced medium roast whole beans. Packed in 250g bags.",
     image: "/images/products/coffee/medium-roast-beans.jpg",
-    alt: "PNG Coffee Medium Roast whole beans 350g bag",
+    alt: "PNG Coffee Medium Roast whole beans 250g bag",
     bundles: { 3: { sku: "MRB-3", stock: 100 }, 6: { sku: "MRB-6", stock: 100 }, 10: { sku: "MRB-10", stock: 100 } },
   },
   {
@@ -141,9 +141,9 @@ export const PRODUCTS: CoffeeProduct[] = [
     name: "Medium Roast – Ground",
     roast: "Medium Roast",
     grind: "Ground",
-    description: "Smooth, balanced medium roast, freshly ground. Packed in 350g bags.",
+    description: "Smooth, balanced medium roast, freshly ground. Packed in 250g bags.",
     image: "/images/products/coffee/medium-roast-ground.jpg",
-    alt: "PNG Coffee Medium Roast ground 350g bag",
+    alt: "PNG Coffee Medium Roast ground 250g bag",
     bundles: { 3: { sku: "MRG-3", stock: 100 }, 6: { sku: "MRG-6", stock: 100 }, 10: { sku: "MRG-10", stock: 100 } },
   },
 ];

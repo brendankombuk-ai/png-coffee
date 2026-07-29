@@ -47,7 +47,7 @@ export default function BundleModal({
       {
         id: `${product.id}::${size}`,
         productId: product.id,
-        name: `${product.name} · ${size}-Pack (${size} × 350g)`,
+        name: `${product.name} · ${size}-Pack (${size} × 250g)`,
         roast: product.roast,
         grind: product.grind,
         size,
@@ -92,7 +92,7 @@ export default function BundleModal({
                 </div>
                 <div>
                   <h2 className="font-display text-lg font-extrabold uppercase tracking-wide">{product.name}</h2>
-                  <p className="text-xs text-white/55">{product.roast} · {product.grind} · 350g bags</p>
+                  <p className="text-xs text-white/55">{product.roast} · {product.grind} · 250g bags</p>
                 </div>
               </div>
               <button aria-label="Close" onClick={onClose} className="text-white/60 transition-colors hover:text-white">
@@ -121,7 +121,7 @@ export default function BundleModal({
                       }`}
                     >
                       <span className="block text-base font-bold">{s}-Pack</span>
-                      <span className="block text-[11px] text-white/50">{s} × 350g</span>
+                      <span className="block text-[11px] text-white/50">{s} × 250g</span>
                     </button>
                   ))}
                 </div>

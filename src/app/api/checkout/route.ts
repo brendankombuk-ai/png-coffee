@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
         currency: CURRENCY.toLowerCase(),
         unit_amount: toStripeAmount(bundlePrice(zone, item.size)),
         product_data: {
-          name: `${product.name} · ${item.size}-Pack (${item.size} × 350g)`,
+          name: `${product.name} · ${item.size}-Pack (${item.size} × 250g)`,
           metadata: { productId: product.id, size: String(item.size), sku: product.bundles[item.size].sku, zone },
         },
       },

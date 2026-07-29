@@ -156,7 +156,7 @@ export default function CartDrawer() {
                   </div>
                   <p className="mt-2 text-xs text-white/45">
                     {zone
-                      ? `${bagCount} × 350g bags · US$ · postage included.`
+                      ? `${bagCount} × 250g bags · US$ · postage included.`
                       : "Choose your zone to see pricing (postage is included in the price)."}
                   </p>
 

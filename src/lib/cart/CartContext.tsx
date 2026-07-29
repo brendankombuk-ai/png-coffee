@@ -18,7 +18,7 @@ const STORAGE_KEY = "png-coffee-cart";
 type CartContextValue = {
   items: CartItem[];
   itemCount: number;
-  /** Total number of 350g bags across the cart. */
+  /** Total number of 250g bags across the cart. */
   bagCount: number;
   /** Order maths for the current zone (subtotal/shipping/gst/total). */
   quote: OrderQuote;
