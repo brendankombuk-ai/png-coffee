@@ -585,7 +585,7 @@ export const tourismCards: TourismCard[] = [
     id: "wilhelm",
     title: "Mount Wilhelm",
     description:
-      "Mount Wilhelm, Papua New Guinea's highest peak at 4,509 meters, offers breathtaking views and an unforgettable adventure. This iconic climb takes you through lush forests, alpine meadows, and stunning landscapes, making it a must-visit for trekkers and nature lovers.",
+      "Mount Wilhelm, Papua New Guinea's highest peak at 4,509 meters (14,793 feet), offers breathtaking views and an unforgettable adventure. This iconic climb takes you through lush forests, alpine meadows, and stunning landscapes, making it a must-visit for trekkers and nature lovers.",
     icon: "peak",
     image: "/images/png-tourism/wilhelm.jpg",
     alt: "Cloud-wreathed summit ridge of Mount Wilhelm",
@@ -911,5 +911,5 @@ export const contactPage: ContactPageContent = {
     { platform: "TikTok", url: "https://www.tiktok.com/@pngcoffee1996?_r=1&_t=ZS-98GnkxJEsSK" },
   ],
   mapEmbedUrl:
-    "https://www.google.com/maps?q=Sec+64+Lot+11+Gabaka+Street+Gordons+Port+Moresby+National+Capital+District+Papua+New+Guinea&output=embed",
+    "https://www.google.com/maps?q=-9.4552808,147.1922892&z=16&output=embed",
 };
