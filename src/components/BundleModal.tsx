@@ -88,7 +88,7 @@ export default function BundleModal({
             <div className="flex items-start justify-between gap-4 border-b border-white/10 p-5">
               <div className="flex items-center gap-4">
                 <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-white/5">
-                  <Image src={product.image} alt={product.alt} fill sizes="64px" className="object-contain p-1.5" />
+                  <Image src={product.image} alt={product.alt} fill sizes="64px" className="object-cover" />
                 </div>
                 <div>
                   <h2 className="font-display text-lg font-extrabold uppercase tracking-wide">{product.name}</h2>

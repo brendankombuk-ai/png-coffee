@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
@@ -15,6 +15,21 @@ export default function CartDrawer() {
   const { zone } = useZone();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+
+  // When the customer returns from Stripe via the browser's Back button, the
+  // page is restored from the bfcache with our React state frozen — which left
+  // the Checkout button stuck on "Redirecting…" and disabled. Reset it on the
+  // bfcache-restore (pageshow) event so the cart is usable again.
+  useEffect(() => {
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) {
+        setIsCheckingOut(false);
+        setCheckoutError(null);
+      }
+    };
+    window.addEventListener("pageshow", onPageShow);
+    return () => window.removeEventListener("pageshow", onPageShow);
+  }, []);
 
   async function handleCheckout() {
     if (!zone) {
@@ -91,7 +106,7 @@ export default function CartDrawer() {
                     <li key={item.id} className="flex gap-4 rounded-xl border border-white/10 bg-white/[0.04] p-3">
                       <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-white/5">
                         {item.image ? (
-                          <Image src={item.image} alt={item.name} fill sizes="80px" className="object-contain p-1.5" />
+                          <Image src={item.image} alt={item.name} fill sizes="80px" className="object-cover" />
                         ) : (
                           <div className="flex h-full w-full items-center justify-center">
                             <ShoppingBag size={20} className="text-white/20" />

@@ -47,7 +47,7 @@ export default function CoffeeProductGrid() {
                 alt={product.alt}
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                className="object-contain p-5 transition-transform duration-[350ms] ease-out group-hover:scale-105"
+                className="object-cover transition-transform duration-[350ms] ease-out group-hover:scale-105"
               />
               <div className="absolute inset-0 opacity-0 ring-1 ring-inset ring-ember-400/40 transition-opacity duration-500 group-hover:opacity-100" />
             </div>
