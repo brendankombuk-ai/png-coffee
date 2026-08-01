@@ -9,7 +9,7 @@ export default function StoryIntro({
   storyIntro?: typeof staticStoryIntro;
 } = {}) {
   return (
-    <section className="relative z-10 bg-void-950 px-4 pb-16 pt-32 sm:px-6 sm:pt-40">
+    <section className="relative z-10 bg-void-950 px-4 pb-8 pt-20 sm:px-6 sm:pt-24">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}

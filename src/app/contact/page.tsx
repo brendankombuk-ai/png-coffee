@@ -10,12 +10,14 @@ import { getContactPageData } from "@/lib/cms/adapters";
 
 export async function generateMetadata(): Promise<Metadata> {
   const data = await getContactPageData();
+  const title = data.seoTitle ?? "Contact";
+  const description = data.seoDescription ?? data.heroSubtitle;
   return {
-    title: "Contact",
-    description: data.seoDescription || data.heroSubtitle,
+    title,
+    description,
     openGraph: {
-      title: `Contact – ${site.name}`,
-      description: data.seoDescription || data.heroSubtitle,
+      title: `${title} – ${site.name}`,
+      description,
     },
   };
 }

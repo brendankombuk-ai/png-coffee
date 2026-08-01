@@ -1,117 +1,111 @@
-import { strapiFetch, mediaUrl, CmsFetchError } from "./client";
-import { slugify } from "@/lib/slugify";
-import type {
-  StrapiCollectionResponse,
-  StrapiSingleResponse,
-  CmsHomepage,
-  CmsAboutUs,
-  CmsPngCoffeePage,
-  CmsOurCoffeePage,
-  CmsContactPage,
-  CmsCategory,
-  CmsProduct,
-  CmsBlogPost,
-  CmsTestimonial,
-  CmsFaq,
-} from "./types";
-import * as fallback from "@/data/content";
+import { cmsQuery, CmsFetchError } from './client'
+import { slugify } from '@/lib/slugify'
+import type { CmsBlogPost, CmsTestimonial, CmsFaq } from './types'
+import * as fallback from '@/data/content'
 import type {
   FeatureCard,
   ValueCard,
   ValueCardDetail,
   TourismCard,
   ProductCategory,
-  ProductPlaceholder,
   ProductCategoryPageData,
-} from "@/data/content";
-
-/**
- * ---------------------------------------------------------------------------
- * Resilience note
- * ---------------------------------------------------------------------------
- * Every function below tries Strapi first and falls back to the static
- * content in `src/data/content.ts` if the CMS request fails (network error,
- * CMS down, entry not yet created, etc). This means the site stays up even
- * during CMS downtime, at the cost of possibly showing stale/placeholder
- * copy until the CMS comes back. If you'd rather the page fail loudly when
- * Strapi is unreachable (e.g. to catch mistakes during development), remove
- * the try/catch and let `strapiFetch` throw.
- * ---------------------------------------------------------------------------
- */
+} from '@/data/content'
 
 function logCmsFallback(where: string, err: unknown) {
-  const msg = err instanceof CmsFetchError ? err.message : String(err);
-  console.warn(`[cms] ${where}: falling back to static content — ${msg}`);
+  const msg = err instanceof CmsFetchError ? err.message : String(err)
+  console.warn(`[cms] ${where}: falling back to static content — ${msg}`)
 }
 
-/** Split a Strapi richtext blob into paragraphs (blank-line separated). */
 function splitParagraphs(text: string | null | undefined): string[] {
-  if (!text) return [];
+  if (!text) return []
   return text
     .split(/\n\s*\n/)
     .map((p) => p.trim())
-    .filter(Boolean);
+    .filter(Boolean)
 }
 
 /* ============================== Homepage ============================== */
 
 export async function getHero(): Promise<typeof fallback.hero> {
   try {
-    const res = await strapiFetch<StrapiSingleResponse<CmsHomepage>>("/homepage", {
-      query: "populate=*",
-      tags: ["homepage"],
-    });
-    const d = res.data;
-    if (!d) throw new CmsFetchError("Homepage entry not found");
+    const doc = await cmsQuery<{
+      heroEyebrow: string | null
+      heroHeadline: string | null
+      heroBody: string | null
+      heroCta: string | null
+    } | null>(`*[_type == "homepage"][0] { heroEyebrow, heroHeadline, heroBody, heroCta }`, {
+      tags: ['homepage'],
+    })
+    if (!doc) throw new CmsFetchError('Homepage document not found')
     return {
-      eyebrow: d.heroEyebrow ?? fallback.hero.eyebrow,
-      headline: d.heroHeadline ?? fallback.hero.headline,
-      body: splitParagraphs(d.heroBody).length ? splitParagraphs(d.heroBody) : fallback.hero.body,
-      cta: d.heroCta ?? fallback.hero.cta,
-    };
+      eyebrow: doc.heroEyebrow ?? fallback.hero.eyebrow,
+      headline: doc.heroHeadline ?? fallback.hero.headline,
+      body: splitParagraphs(doc.heroBody).length
+        ? splitParagraphs(doc.heroBody)
+        : fallback.hero.body,
+      cta: doc.heroCta ?? fallback.hero.cta,
+    }
   } catch (err) {
-    logCmsFallback("getHero", err);
-    return fallback.hero;
+    logCmsFallback('getHero', err)
+    return fallback.hero
   }
 }
 
 export async function getBanner(): Promise<typeof fallback.banner> {
   try {
-    const res = await strapiFetch<StrapiSingleResponse<CmsHomepage>>("/homepage", {
-      tags: ["homepage"],
-    });
-    const d = res.data;
-    if (!d) throw new CmsFetchError("Homepage entry not found");
+    const doc = await cmsQuery<{
+      bannerLineOne: string | null
+      bannerLineTwo: string | null
+    } | null>(`*[_type == "homepage"][0] { bannerLineOne, bannerLineTwo }`, {
+      tags: ['homepage'],
+    })
+    if (!doc) throw new CmsFetchError('Homepage document not found')
     return {
-      lineOne: d.bannerLineOne ?? fallback.banner.lineOne,
-      lineTwo: d.bannerLineTwo ?? fallback.banner.lineTwo,
-    };
+      lineOne: doc.bannerLineOne ?? fallback.banner.lineOne,
+      lineTwo: doc.bannerLineTwo ?? fallback.banner.lineTwo,
+    }
   } catch (err) {
-    logCmsFallback("getBanner", err);
-    return fallback.banner;
+    logCmsFallback('getBanner', err)
+    return fallback.banner
   }
 }
 
 export async function getFeatureCards(): Promise<FeatureCard[]> {
   try {
-    const res = await strapiFetch<StrapiSingleResponse<CmsHomepage>>("/homepage", {
-      query: "populate[featureCards][populate]=image",
-      tags: ["homepage"],
-    });
-    const cards = res.data?.featureCards;
-    if (!cards || cards.length === 0) throw new CmsFetchError("No feature cards in CMS");
+    const doc = await cmsQuery<{
+      featureCards: {
+        title: string
+        imageUrl: string | null
+        alt: string | null
+        description: string | null
+        href: string
+      }[]
+    } | null>(
+      `*[_type == "homepage"][0] {
+        "featureCards": featureCards[] {
+          title,
+          "imageUrl": image.asset->url,
+          alt,
+          description,
+          href
+        }
+      }`,
+      { tags: ['homepage'] }
+    )
+    const cards = doc?.featureCards
+    if (!cards || cards.length === 0) throw new CmsFetchError('No feature cards in CMS')
     return cards.map((c, i) => ({
-      id: c.href.replace(/\//g, "") || `card-${i}`,
-      index: String(i + 1).padStart(2, "0"),
+      id: c.href.replace(/\//g, '') || `card-${i}`,
+      index: String(i + 1).padStart(2, '0'),
       title: c.title,
-      image: mediaUrl(c.image?.url),
+      image: c.imageUrl ?? '',
       alt: c.alt ?? c.title,
-      description: c.description ?? "",
+      description: c.description ?? '',
       href: c.href,
-    }));
+    }))
   } catch (err) {
-    logCmsFallback("getFeatureCards", err);
-    return fallback.featureCards;
+    logCmsFallback('getFeatureCards', err)
+    return fallback.featureCards
   }
 }
 
@@ -119,143 +113,194 @@ export async function getFeatureCards(): Promise<FeatureCard[]> {
 
 export async function getStoryIntro(): Promise<typeof fallback.storyIntro> {
   try {
-    const res = await strapiFetch<StrapiSingleResponse<CmsAboutUs>>("/about-us");
-    const d = res.data;
-    if (!d) throw new CmsFetchError("About Us entry not found");
-    const paragraphs = splitParagraphs(d.storyParagraphs);
+    const doc = await cmsQuery<{
+      storyHeading: string | null
+      storyParagraphs: string | null
+    } | null>(`*[_type == "aboutUs"][0] { storyHeading, storyParagraphs }`, {
+      tags: ['aboutUs'],
+    })
+    if (!doc) throw new CmsFetchError('About Us document not found')
+    const paragraphs = splitParagraphs(doc.storyParagraphs)
     return {
-      heading: d.storyHeading ?? fallback.storyIntro.heading,
+      heading: doc.storyHeading ?? fallback.storyIntro.heading,
       paragraphs: paragraphs.length ? paragraphs : fallback.storyIntro.paragraphs,
-    };
+    }
   } catch (err) {
-    logCmsFallback("getStoryIntro", err);
-    return fallback.storyIntro;
+    logCmsFallback('getStoryIntro', err)
+    return fallback.storyIntro
   }
 }
 
 export async function getExploreLinks(): Promise<typeof fallback.exploreLinks> {
   try {
-    const res = await strapiFetch<StrapiSingleResponse<CmsAboutUs>>("/about-us", {
-      query: "populate=exploreLinks",
-    });
-    const links = res.data?.exploreLinks;
-    if (!links || links.length === 0) throw new CmsFetchError("No explore links in CMS");
-    return links.map((l) => ({ label: l.label, href: l.href }));
+    const doc = await cmsQuery<{
+      exploreLinks: { label: string; href: string }[]
+    } | null>(
+      `*[_type == "aboutUs"][0] { "exploreLinks": exploreLinks[] { label, href } }`,
+      { tags: ['aboutUs'] }
+    )
+    const links = doc?.exploreLinks
+    if (!links || links.length === 0) throw new CmsFetchError('No explore links in CMS')
+    return links.map((l) => ({ label: l.label, href: l.href }))
   } catch (err) {
-    logCmsFallback("getExploreLinks", err);
-    return fallback.exploreLinks;
+    logCmsFallback('getExploreLinks', err)
+    return fallback.exploreLinks
   }
 }
 
 export async function getMissionSection(): Promise<typeof fallback.missionSection> {
   try {
-    const res = await strapiFetch<StrapiSingleResponse<CmsAboutUs>>("/about-us");
-    const d = res.data;
-    if (!d) throw new CmsFetchError("About Us entry not found");
+    const doc = await cmsQuery<{
+      missionHeading: string | null
+      missionTagline: string | null
+      missionParagraph: string | null
+    } | null>(`*[_type == "aboutUs"][0] { missionHeading, missionTagline, missionParagraph }`, {
+      tags: ['aboutUs'],
+    })
+    if (!doc) throw new CmsFetchError('About Us document not found')
     return {
-      heading: d.missionHeading ?? fallback.missionSection.heading,
-      tagline: d.missionTagline ?? fallback.missionSection.tagline,
-      paragraph: d.missionParagraph ?? fallback.missionSection.paragraph,
-    };
+      heading: doc.missionHeading ?? fallback.missionSection.heading,
+      tagline: doc.missionTagline ?? fallback.missionSection.tagline,
+      paragraph: doc.missionParagraph ?? fallback.missionSection.paragraph,
+    }
   } catch (err) {
-    logCmsFallback("getMissionSection", err);
-    return fallback.missionSection;
+    logCmsFallback('getMissionSection', err)
+    return fallback.missionSection
   }
 }
 
 export async function getValueCards(): Promise<ValueCard[]> {
   try {
-    const res = await strapiFetch<StrapiSingleResponse<CmsAboutUs>>("/about-us", {
-      query: "populate[valueCards][populate]=image",
-    });
-    const cards = res.data?.valueCards;
-    if (!cards || cards.length === 0) throw new CmsFetchError("No value cards in CMS");
+    const doc = await cmsQuery<{
+      valueCards: {
+        title: string
+        description: string
+        icon: string
+        imageUrl: string | null
+        alt: string | null
+        accent: string | null
+      }[]
+    } | null>(
+      `*[_type == "aboutUs"][0] {
+        "valueCards": valueCards[] {
+          title,
+          description,
+          icon,
+          "imageUrl": image.asset->url,
+          alt,
+          accent
+        }
+      }`,
+      { tags: ['aboutUs'] }
+    )
+    const cards = doc?.valueCards
+    if (!cards || cards.length === 0) throw new CmsFetchError('No value cards in CMS')
     return cards.map((c) => {
-      const slug = slugify(c.title);
+      const slug = slugify(c.title)
+      const staticCard = fallback.valueCards.find((fc) => fc.slug === slug || fc.id === slug)
       return {
         id: slug,
         slug,
         title: c.title,
         description: c.description,
-        icon: c.icon,
-        image: mediaUrl(c.image?.url),
+        icon: c.icon as ValueCard['icon'],
+        image: c.imageUrl ?? '',
         alt: c.alt ?? c.title,
-        accent: c.accent ?? "from-ember-600 to-ember-800",
-      };
-    });
+        accent: c.accent ?? 'from-ember-600 to-ember-800',
+        href: staticCard?.href,
+      }
+    })
   } catch (err) {
-    logCmsFallback("getValueCards", err);
-    return fallback.valueCards;
+    logCmsFallback('getValueCards', err)
+    return fallback.valueCards
   }
 }
 
-/**
- * Full detail-page content for a single value card, looked up by slug.
- *
- * Strapi's `about-us` value-card component doesn't have long-form body
- * content yet, so this only tries the CMS for the summary fields (title,
- * description, image) and always sources the long-form paragraphs and
- * highlights from static content. If a slug matches neither the CMS nor the
- * static detail map, this returns null and the page 404s.
- */
 export async function getValueCardDetail(
   slug: string
 ): Promise<(ValueCard & ValueCardDetail) | null> {
-  const cards = await getValueCards();
-  const card = cards.find((c) => c.slug === slug);
-  if (!card) return null;
+  const cards = await getValueCards()
+  const card = cards.find((c) => c.slug === slug)
+  if (!card) return null
 
-  const detail = fallback.valueCardDetails[slug];
-  if (detail) return { ...card, ...detail };
+  const detail = fallback.valueCardDetails[slug]
+  if (detail) return { ...card, ...detail }
 
-  // A CMS-authored card with no matching static detail content yet still
-  // gets a working page, just without the extended body/highlights.
   return {
     ...card,
     eyebrow: card.title,
     intro: card.description,
     paragraphs: [card.description],
     highlights: [],
-  };
+  }
 }
 
 /* ============================== PNG page ============================== */
 
 export async function getPngTourism(): Promise<typeof fallback.pngTourism> {
   try {
-    const res = await strapiFetch<StrapiSingleResponse<CmsPngCoffeePage>>("/png-coffee-page");
-    const d = res.data;
-    if (!d) throw new CmsFetchError("PNG Coffee Page entry not found");
-    const paragraphs = splitParagraphs(d.heroParagraphs);
+    const doc = await cmsQuery<{
+      heroTitle: string | null
+      heroParagraphs: string | null
+    } | null>(`*[_type == "pngCoffeePage"][0] { heroTitle, heroParagraphs }`, {
+      tags: ['pngCoffeePage'],
+    })
+    if (!doc) throw new CmsFetchError('PNG Coffee Page document not found')
+    const paragraphs = splitParagraphs(doc.heroParagraphs)
     return {
-      title: d.heroTitle ?? fallback.pngTourism.title,
+      title: doc.heroTitle ?? fallback.pngTourism.title,
       paragraphs: paragraphs.length ? paragraphs : fallback.pngTourism.paragraphs,
-    };
+    }
   } catch (err) {
-    logCmsFallback("getPngTourism", err);
-    return fallback.pngTourism;
+    logCmsFallback('getPngTourism', err)
+    return fallback.pngTourism
   }
 }
 
 export async function getTourismCards(): Promise<TourismCard[]> {
   try {
-    const res = await strapiFetch<StrapiSingleResponse<CmsPngCoffeePage>>("/png-coffee-page", {
-      query: "populate[tourismCards][populate]=image",
-    });
-    const cards = res.data?.tourismCards;
-    if (!cards || cards.length === 0) throw new CmsFetchError("No tourism cards in CMS");
-    return cards.map((c, i) => ({
-      id: `tourism-card-${i}`,
-      title: c.title,
-      description: c.description,
-      icon: c.icon,
-      image: mediaUrl(c.image?.url),
-      alt: c.alt ?? c.title,
-      accent: c.accent ?? "from-ember-700 to-void-900",
-    }));
+    const doc = await cmsQuery<{
+      tourismCards: {
+        title: string
+        description: string
+        icon: string
+        imageUrl: string | null
+        alt: string | null
+        accent: string | null
+      }[]
+    } | null>(
+      `*[_type == "pngCoffeePage"][0] {
+        "tourismCards": tourismCards[] {
+          title,
+          description,
+          icon,
+          "imageUrl": image.asset->url,
+          alt,
+          accent
+        }
+      }`,
+      { tags: ['pngCoffeePage'] }
+    )
+    const cards = doc?.tourismCards
+    if (!cards || cards.length === 0) throw new CmsFetchError('No tourism cards in CMS')
+    return cards.map((c, i) => {
+      const staticCard = fallback.tourismCards.find(
+        (fc) => fc.title.toLowerCase() === c.title.toLowerCase()
+      )
+      return {
+        id: `tourism-card-${i}`,
+        title: c.title,
+        description: c.description,
+        icon: c.icon as TourismCard['icon'],
+        image: c.imageUrl ?? '',
+        alt: c.alt ?? c.title,
+        accent: c.accent ?? 'from-ember-700 to-void-900',
+        href: staticCard?.href,
+      }
+    })
   } catch (err) {
-    logCmsFallback("getTourismCards", err);
-    return fallback.tourismCards;
+    logCmsFallback('getTourismCards', err)
+    return fallback.tourismCards
   }
 }
 
@@ -263,103 +308,126 @@ export async function getTourismCards(): Promise<TourismCard[]> {
 
 export async function getProductsHero(): Promise<typeof fallback.productsHero> {
   try {
-    const res = await strapiFetch<StrapiSingleResponse<CmsOurCoffeePage>>("/our-coffee-page");
-    const d = res.data;
-    if (!d) throw new CmsFetchError("Our Coffee Page entry not found");
-    const paragraphs = splitParagraphs(d.heroParagraphs);
+    const doc = await cmsQuery<{
+      heroTitle: string | null
+      heroParagraphs: string | null
+    } | null>(`*[_type == "ourCoffeePage"][0] { heroTitle, heroParagraphs }`, {
+      tags: ['ourCoffeePage'],
+    })
+    if (!doc) throw new CmsFetchError('Our Coffee Page document not found')
+    const paragraphs = splitParagraphs(doc.heroParagraphs)
     return {
-      title: d.heroTitle ?? fallback.productsHero.title,
+      title: doc.heroTitle ?? fallback.productsHero.title,
       paragraphs: paragraphs.length ? paragraphs : fallback.productsHero.paragraphs,
-    };
+    }
   } catch (err) {
-    logCmsFallback("getProductsHero", err);
-    return fallback.productsHero;
+    logCmsFallback('getProductsHero', err)
+    return fallback.productsHero
   }
 }
 
 export async function getProductsValueAdded(): Promise<typeof fallback.productsValueAdded> {
   try {
-    const res = await strapiFetch<StrapiSingleResponse<CmsOurCoffeePage>>("/our-coffee-page");
-    const d = res.data;
-    if (!d) throw new CmsFetchError("Our Coffee Page entry not found");
+    const doc = await cmsQuery<{
+      valueAddedTitle: string | null
+      valueAddedIntro: string | null
+      valueAddedItems: string[] | null
+      valueAddedOutro: string | null
+    } | null>(
+      `*[_type == "ourCoffeePage"][0] { valueAddedTitle, valueAddedIntro, valueAddedItems, valueAddedOutro }`,
+      { tags: ['ourCoffeePage'] }
+    )
+    if (!doc) throw new CmsFetchError('Our Coffee Page document not found')
     return {
-      title: d.valueAddedTitle ?? fallback.productsValueAdded.title,
-      intro: d.valueAddedIntro ?? fallback.productsValueAdded.intro,
-      items:
-        d.valueAddedItems && d.valueAddedItems.length
-          ? d.valueAddedItems
-          : fallback.productsValueAdded.items,
-      outro: d.valueAddedOutro ?? fallback.productsValueAdded.outro,
-    };
+      title: doc.valueAddedTitle ?? fallback.productsValueAdded.title,
+      intro: doc.valueAddedIntro ?? fallback.productsValueAdded.intro,
+      items: doc.valueAddedItems?.length ? doc.valueAddedItems : fallback.productsValueAdded.items,
+      outro: doc.valueAddedOutro ?? fallback.productsValueAdded.outro,
+    }
   } catch (err) {
-    logCmsFallback("getProductsValueAdded", err);
-    return fallback.productsValueAdded;
+    logCmsFallback('getProductsValueAdded', err)
+    return fallback.productsValueAdded
   }
 }
 
-/** Categories for the 4-card grid on /products (falls back to static list). */
 export async function getProductCategories(): Promise<ProductCategory[]> {
   try {
-    const res = await strapiFetch<StrapiCollectionResponse<CmsCategory>>("/categories", {
-      query: "populate=image&sort=name:asc",
-      tags: ["categories"],
-    });
-    if (!res.data.length) throw new CmsFetchError("No categories in CMS");
-    return res.data.map((c) => ({
+    const categories = await cmsQuery<
+      { slug: string; name: string; imageUrl: string | null; alt: string | null }[]
+    >(
+      `*[_type == "category"] | order(name asc) {
+        "slug": slug.current,
+        name,
+        "imageUrl": image.asset->url,
+        "alt": image.asset->altText
+      }`,
+      { tags: ['categories'] }
+    )
+    if (!categories.length) throw new CmsFetchError('No categories in CMS')
+    return categories.map((c) => ({
       id: c.slug,
       slug: c.slug,
       label: c.name,
-      image: mediaUrl(c.image?.url),
-      alt: c.image?.alternativeText ?? c.name,
-    }));
+      image: c.imageUrl ?? '',
+      alt: c.alt ?? c.name,
+    }))
   } catch (err) {
-    logCmsFallback("getProductCategories", err);
-    return fallback.productCategories;
+    logCmsFallback('getProductCategories', err)
+    return fallback.productCategories
   }
 }
 
-function mapCmsProductToPlaceholder(p: CmsProduct): ProductPlaceholder {
-  return {
-    id: p.slug,
-    name: p.name,
-    description: p.shortDescription ?? "",
-    price: p.salePrice ?? p.price ?? 0,
-    image: mediaUrl(p.featuredImage?.url),
-    alt: p.featuredImage?.alternativeText ?? p.name,
-  };
-}
-
-/**
- * Full data for a /products/[slug] category detail page: title, description,
- * and every published product in that category. Falls back to the static
- * `productCategoryPages` map (including its placeholder products) if the
- * category doesn't exist in Strapi yet.
- */
 export async function getProductCategoryPageData(
   slug: string
 ): Promise<ProductCategoryPageData | null> {
   try {
-    const catRes = await strapiFetch<StrapiCollectionResponse<CmsCategory>>("/categories", {
-      query: `filters[slug][$eq]=${encodeURIComponent(slug)}`,
-      tags: [`category:${slug}`],
-    });
-    const category = catRes.data[0];
-    if (!category) throw new CmsFetchError(`Category "${slug}" not found in CMS`);
-
-    const prodRes = await strapiFetch<StrapiCollectionResponse<CmsProduct>>("/products", {
-      query: `filters[category][slug][$eq]=${encodeURIComponent(slug)}&populate=featuredImage&sort=name:asc`,
-      tags: [`category:${slug}`],
-    });
-
+    const category = await cmsQuery<{
+      slug: string
+      name: string
+      description: string | null
+      products: {
+        slug: string
+        name: string
+        shortDescription: string | null
+        price: number
+        salePrice: number | null
+        imageUrl: string | null
+        alt: string | null
+      }[]
+    } | null>(
+      `*[_type == "category" && slug.current == $slug][0] {
+        "slug": slug.current,
+        name,
+        description,
+        "products": *[_type == "product" && references(^._id)] | order(name asc) {
+          "slug": slug.current,
+          name,
+          shortDescription,
+          price,
+          salePrice,
+          "imageUrl": featuredImage.asset->url,
+          "alt": featuredImage.asset->altText
+        }
+      }`,
+      { params: { slug }, tags: [`category:${slug}`] }
+    )
+    if (!category) throw new CmsFetchError(`Category "${slug}" not found in CMS`)
     return {
       slug: category.slug,
       title: category.name,
-      description: category.description ?? "",
-      products: prodRes.data.map(mapCmsProductToPlaceholder),
-    };
+      description: category.description ?? '',
+      products: category.products.map((p) => ({
+        id: p.slug,
+        name: p.name,
+        description: p.shortDescription ?? '',
+        price: p.salePrice ?? p.price ?? 0,
+        image: p.imageUrl ?? '',
+        alt: p.alt ?? p.name,
+      })),
+    }
   } catch (err) {
-    logCmsFallback(`getProductCategoryPageData(${slug})`, err);
-    return fallback.productCategoryPages[slug] ?? null;
+    logCmsFallback(`getProductCategoryPageData(${slug})`, err)
+    return fallback.productCategoryPages[slug] ?? null
   }
 }
 
@@ -369,34 +437,70 @@ export async function getContactPageData(): Promise<
   typeof fallback.contactPage & { seoTitle?: string | null; seoDescription?: string | null }
 > {
   try {
-    const res = await strapiFetch<StrapiSingleResponse<CmsContactPage>>("/contact-page", {
-      query: "populate=*",
-      tags: ["contact-page"],
-    });
-    const d = res.data;
-    if (!d) throw new CmsFetchError("Contact Page entry not found");
-
+    const doc = await cmsQuery<{
+      phone: string | null
+      email: string | null
+      address: string | null
+      googleMapEmbedUrl: string | null
+      businessHours: { day: string; hours: string }[]
+      socialLinks: { platform: string; url: string }[]
+      seoTitle: string | null
+      seoDescription: string | null
+    } | null>(
+      `*[_type == "contactPage"][0] {
+        phone,
+        email,
+        address,
+        googleMapEmbedUrl,
+        businessHours,
+        socialLinks,
+        seoTitle,
+        seoDescription
+      }`,
+      { tags: ['contactPage'] }
+    )
+    if (!doc) throw new CmsFetchError('Contact Page document not found')
     return {
-      // Hero/intro copy isn't in the Strapi schema (marketing copy, not
-      // treated as CMS-editable content) — always from static content.
       heroTitle: fallback.contactPage.heroTitle,
       heroSubtitle: fallback.contactPage.heroSubtitle,
       introHeading: fallback.contactPage.introHeading,
       introText: fallback.contactPage.introText,
-      phone: d.phone ?? fallback.contactPage.phone,
-      email: d.email ?? fallback.contactPage.email,
-      address: d.address ? d.address.split(/\n+/).filter(Boolean) : fallback.contactPage.address,
-      businessHours: d.businessHours.length ? d.businessHours : fallback.contactPage.businessHours,
-      socialLinks: d.socialLinks.length
-        ? (d.socialLinks as typeof fallback.contactPage.socialLinks)
+      phone: doc.phone ?? fallback.contactPage.phone,
+      email: doc.email ?? fallback.contactPage.email,
+      address: doc.address
+        ? doc.address.split(/\n+/).filter(Boolean)
+        : fallback.contactPage.address,
+      businessHours: doc.businessHours?.length
+        ? doc.businessHours
+        : fallback.contactPage.businessHours,
+      socialLinks: doc.socialLinks?.length
+        ? (doc.socialLinks as typeof fallback.contactPage.socialLinks)
         : fallback.contactPage.socialLinks,
-      mapEmbedUrl: d.googleMapEmbedUrl ?? fallback.contactPage.mapEmbedUrl,
-      seoTitle: d.seoTitle,
-      seoDescription: d.seoDescription,
-    };
+      mapEmbedUrl: doc.googleMapEmbedUrl ?? fallback.contactPage.mapEmbedUrl,
+      seoTitle: doc.seoTitle,
+      seoDescription: doc.seoDescription,
+    }
   } catch (err) {
-    logCmsFallback("getContactPageData", err);
-    return fallback.contactPage;
+    logCmsFallback('getContactPageData', err)
+    return fallback.contactPage
+  }
+}
+
+/* ============================== Page SEO ============================== */
+
+/** Fetch seoTitle + seoDescription for any singleton page type. */
+export async function getPageSeo(type: string): Promise<{
+  seoTitle: string | null
+  seoDescription: string | null
+}> {
+  try {
+    const doc = await cmsQuery<{ seoTitle: string | null; seoDescription: string | null } | null>(
+      `*[_type == $type][0] { seoTitle, seoDescription }`,
+      { params: { type }, revalidate: 3600 }
+    )
+    return { seoTitle: doc?.seoTitle ?? null, seoDescription: doc?.seoDescription ?? null }
+  } catch {
+    return { seoTitle: null, seoDescription: null }
   }
 }
 
@@ -404,27 +508,49 @@ export async function getContactPageData(): Promise<
 
 export async function getBlogPosts(): Promise<CmsBlogPost[]> {
   try {
-    const res = await strapiFetch<StrapiCollectionResponse<CmsBlogPost>>("/blog-posts", {
-      query: "populate=featuredImage,category,tags&sort=publishDate:desc",
-      tags: ["blog-posts"],
-    });
-    return res.data;
+    return await cmsQuery<CmsBlogPost[]>(
+      `*[_type == "blogPost"] | order(publishDate desc) {
+        _id,
+        title,
+        "slug": slug.current,
+        content,
+        excerpt,
+        "featuredImage": { "url": featuredImage.asset->url },
+        publishDate,
+        category,
+        tags,
+        seoTitle,
+        seoDescription
+      }`,
+      { tags: ['blogPosts'] }
+    )
   } catch (err) {
-    logCmsFallback("getBlogPosts", err);
-    return [];
+    logCmsFallback('getBlogPosts', err)
+    return []
   }
 }
 
 export async function getBlogPostBySlug(slug: string): Promise<CmsBlogPost | null> {
   try {
-    const res = await strapiFetch<StrapiCollectionResponse<CmsBlogPost>>("/blog-posts", {
-      query: `filters[slug][$eq]=${encodeURIComponent(slug)}&populate=featuredImage,gallery,category,tags,relatedProducts`,
-      tags: [`blog-post:${slug}`],
-    });
-    return res.data[0] ?? null;
+    return await cmsQuery<CmsBlogPost | null>(
+      `*[_type == "blogPost" && slug.current == $slug][0] {
+        _id,
+        title,
+        "slug": slug.current,
+        content,
+        excerpt,
+        "featuredImage": { "url": featuredImage.asset->url },
+        publishDate,
+        category,
+        tags,
+        seoTitle,
+        seoDescription
+      }`,
+      { params: { slug }, tags: [`blogPost:${slug}`] }
+    )
   } catch (err) {
-    logCmsFallback(`getBlogPostBySlug(${slug})`, err);
-    return null;
+    logCmsFallback(`getBlogPostBySlug(${slug})`, err)
+    return null
   }
 }
 
@@ -432,26 +558,36 @@ export async function getBlogPostBySlug(slug: string): Promise<CmsBlogPost | nul
 
 export async function getTestimonials(): Promise<CmsTestimonial[]> {
   try {
-    const res = await strapiFetch<StrapiCollectionResponse<CmsTestimonial>>("/testimonials", {
-      query: "populate=photo",
-      tags: ["testimonials"],
-    });
-    return res.data;
+    return await cmsQuery<CmsTestimonial[]>(
+      `*[_type == "testimonial"] {
+        _id,
+        customerName,
+        location,
+        "photo": { "url": photo.asset->url },
+        rating,
+        review
+      }`,
+      { tags: ['testimonials'] }
+    )
   } catch (err) {
-    logCmsFallback("getTestimonials", err);
-    return [];
+    logCmsFallback('getTestimonials', err)
+    return []
   }
 }
 
 export async function getFaqs(): Promise<CmsFaq[]> {
   try {
-    const res = await strapiFetch<StrapiCollectionResponse<CmsFaq>>("/faqs", {
-      query: "populate=category",
-      tags: ["faqs"],
-    });
-    return res.data;
+    return await cmsQuery<CmsFaq[]>(
+      `*[_type == "faq"] {
+        _id,
+        question,
+        answer,
+        category
+      }`,
+      { tags: ['faqs'] }
+    )
   } catch (err) {
-    logCmsFallback("getFaqs", err);
-    return [];
+    logCmsFallback('getFaqs', err)
+    return []
   }
 }

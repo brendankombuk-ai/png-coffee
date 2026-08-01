@@ -9,7 +9,7 @@ export default function ProductsHero({
   productsHero?: typeof staticProductsHero;
 } = {}) {
   return (
-    <section className="relative z-10 mx-auto max-w-[1400px] px-6 pb-16 pt-[120px] sm:px-10 sm:pt-[140px]">
+    <section className="relative z-10 mx-auto max-w-[1400px] px-6 pb-8 pt-[120px] sm:px-10 sm:pt-[140px]">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}

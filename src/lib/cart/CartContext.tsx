@@ -83,7 +83,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const clearCart = useCallback(() => setItems([]), []);
+  const clearCart = useCallback(() => {
+    setItems([]);
+    try { window.localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
+  }, []);
   const openCart = useCallback(() => setIsOpen(true), []);
   const closeCart = useCallback(() => setIsOpen(false), []);
 
