@@ -22,7 +22,8 @@ async function uploadImage(publicPath: string) {
   return { _type: 'image' as const, asset: { _type: 'reference' as const, _ref: asset._id } }
 }
 
-function img(maybeImg: { _type: 'image'; asset: { _type: 'reference'; _ref: string } } | undefined) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function img(maybeImg: { _type: 'image'; asset: { _type: 'reference'; _ref: string } } | undefined): Record<string, any> {
   return maybeImg ? { image: maybeImg } : {}
 }
 

@@ -9,10 +9,12 @@ import { useCart } from "@/lib/cart/CartContext";
 import { useZone } from "@/lib/zone/ZoneContext";
 import { formatPrice } from "@/lib/cart/currency";
 import {
-  BUNDLE_TIERS,
-  PACKET_GRAMS,
+  BUNDLE_SIZES,
+  BAG_GRAMS,
   bundlePrice,
-  type BundleTier,
+  type BundleSize,
+  type Roast,
+  type Grind,
 } from "@/lib/shipping/zones";
 import type { ProductPlaceholder } from "@/data/content";
 
@@ -26,7 +28,7 @@ export default function ProductCard({
   const { addItem } = useCart();
   const { zone } = useZone();
   const [justAdded, setJustAdded] = useState(false);
-  const [tier, setTier] = useState<BundleTier>(6);
+  const [tier, setTier] = useState<BundleSize>(6);
   const [grind, setGrind] = useState(product.grindOptions?.[0] ?? "");
 
   const online = product.soldOnline === true;
@@ -35,14 +37,16 @@ export default function ProductCard({
   function handleAddToCart() {
     if (!zone) return;
     const grindSuffix = grind ? ` (${grind})` : "";
+    const roastValue: Roast = product.name.toLowerCase().includes("dark") ? "Dark Roast" : "Medium Roast";
+    const grindValue: Grind = grind === "Ground" ? "Ground" : "Beans";
     addItem({
       id: `${product.id}::${tier}pk${grind ? `::${grind}` : ""}`,
-      name: `${product.name} — ${tier} × ${PACKET_GRAMS}g${grindSuffix}`,
-      price: bundlePrice(zone, tier),
+      productId: product.id,
+      name: `${product.name} — ${tier} × ${BAG_GRAMS}g${grindSuffix}`,
+      roast: roastValue,
+      grind: grindValue,
+      size: tier,
       image: product.image,
-      categorySlug,
-      bundleTier: tier,
-      grind: grind || undefined,
     });
     setJustAdded(true);
     window.setTimeout(() => setJustAdded(false), 1500);
@@ -82,7 +86,7 @@ export default function ProductCard({
           <div className="space-y-3 pt-1">
             {/* Bundle size selector */}
             <div className="flex justify-center gap-1.5" role="group" aria-label="Bundle size">
-              {BUNDLE_TIERS.map((t) => (
+              {BUNDLE_SIZES.map((t) => (
                 <button
                   key={t}
                   type="button"
@@ -116,7 +120,7 @@ export default function ProductCard({
             )}
 
             <p className="text-[11px] text-white/45">
-              {tier} × {PACKET_GRAMS}g ({(tier * PACKET_GRAMS) / 1000}kg) · postage included
+              {tier} × {BAG_GRAMS}g ({(tier * BAG_GRAMS) / 1000}kg) · postage included
             </p>
 
             {/* Price + add, or a prompt to pick a zone */}
