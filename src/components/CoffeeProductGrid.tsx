@@ -4,16 +4,13 @@ import { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { staggerContainer, cardReveal } from "@/lib/animations";
-import { formatPrice } from "@/lib/cart/currency";
-import { useZone } from "@/lib/zone/ZoneContext";
 import ZoneSelector from "./ZoneSelector";
 import BundleModal from "./BundleModal";
-import { PRODUCTS, bundlePrice, type CoffeeProduct } from "@/lib/shipping/zones";
+import { PRODUCTS, type CoffeeProduct } from "@/lib/shipping/zones";
 
 export default function CoffeeProductGrid() {
   const [active, setActive] = useState<CoffeeProduct | null>(null);
   const [open, setOpen] = useState(false);
-  const { zone } = useZone();
 
   function selectBundle(product: CoffeeProduct) {
     setActive(product);
@@ -27,13 +24,13 @@ export default function CoffeeProductGrid() {
         <ZoneSelector />
       </div>
 
-      {/* Step 2 — four products */}
+      {/* Step 2 — four products in a single row */}
       <motion.div
         variants={staggerContainer}
         initial="hidden"
         whileInView="show"
         viewport={{ once: true, margin: "-80px" }}
-        className="mx-auto grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
+        className="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-6"
       >
         {PRODUCTS.map((product) => (
           <motion.article
@@ -46,31 +43,26 @@ export default function CoffeeProductGrid() {
                 src={product.image}
                 alt={product.alt}
                 fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                sizes="(max-width: 640px) 50vw, 25vw"
                 className="object-cover transition-transform duration-[350ms] ease-out group-hover:scale-105"
               />
               <div className="absolute inset-0 opacity-0 ring-1 ring-inset ring-ember-400/40 transition-opacity duration-500 group-hover:opacity-100" />
             </div>
 
-            <div className="flex flex-1 flex-col px-5 pb-6 pt-5 text-center">
-              <h3 className="font-display text-base font-extrabold uppercase tracking-wide text-white">
+            <div className="flex flex-1 flex-col px-3 pb-5 pt-4 text-center sm:px-5 sm:pb-6 sm:pt-5">
+              <h3 className="font-display text-base font-extrabold uppercase tracking-wide text-white sm:text-lg lg:text-xl">
                 {product.name}
               </h3>
-              <p className="mt-1 text-[11px] font-semibold uppercase tracking-widest text-ember-300">
+              <p className="mt-1 text-xs font-semibold uppercase tracking-widest text-ember-300 sm:text-sm">
                 {product.roast} · {product.grind}
               </p>
-              <p className="mt-2 flex-1 text-sm leading-relaxed text-white/65">{product.description}</p>
-              <p className="mt-3 text-sm text-white/70">
-                {zone ? (
-                  <>From <span className="font-display text-lg font-bold text-white">{formatPrice(bundlePrice(zone, 3))}</span></>
-                ) : (
-                  <span className="text-white/45">Select a zone for pricing</span>
-                )}
+              <p className="mt-2 flex-1 text-sm leading-relaxed text-white/65 sm:text-base">
+                {product.description}
               </p>
               <button
                 type="button"
                 onClick={() => selectBundle(product)}
-                className="mt-4 inline-flex items-center justify-center gap-2 rounded-full border border-ember-400/30 bg-ember-500/15 px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-white/90 transition-colors duration-300 hover:border-ember-400/70 hover:bg-ember-500/25 hover:text-ember-100"
+                className="mt-4 inline-flex items-center justify-center gap-2 rounded-full border border-ember-400/30 bg-ember-500/15 px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-white/90 transition-colors duration-300 hover:border-ember-400/70 hover:bg-ember-500/25 hover:text-ember-100 sm:text-sm"
               >
                 Select Bundle
               </button>
