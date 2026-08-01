@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import TribalBackdrop from "@/components/TribalBackdrop";
 import ProductsHero from "@/components/ProductsHero";
-import CoffeeProductGrid from "@/components/CoffeeProductGrid";
+import PurchaseWizard from "@/components/PurchaseWizard";
+import ShoppingGuide from "@/components/ShoppingGuide";
 import ProductsValueAdded from "@/components/ProductsValueAdded";
 import Footer from "@/components/Footer";
 import { site } from "@/data/content";
@@ -30,9 +31,28 @@ export default async function ProductsPage() {
       <Navbar />
       <TribalBackdrop src="/images/our-coffee.jpg" />
       <main id="main-content" className="relative">
-        <ProductsHero productsHero={productsHero} />
-        <CoffeeProductGrid />
-        <ProductsValueAdded productsValueAdded={productsValueAdded} />
+        {/* ── Products section ── */}
+        <section aria-label="Our Products">
+          <ProductsHero productsHero={productsHero} />
+          <ProductsValueAdded productsValueAdded={productsValueAdded} />
+        </section>
+
+        {/* ── Section divider ── */}
+        <div className="relative z-10 mx-auto max-w-[900px] px-6 sm:px-10">
+          <div className="flex items-center gap-4 py-4">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-ember-500/40 to-ember-500/40" />
+            <span className="shrink-0 font-display text-[11px] font-bold uppercase tracking-[0.35em] text-ember-400">
+              Shop Online
+            </span>
+            <div className="h-px flex-1 bg-gradient-to-l from-transparent via-ember-500/40 to-ember-500/40" />
+          </div>
+        </div>
+
+        {/* ── Shopping section ── */}
+        <section aria-label="Order Coffee Online">
+          <ShoppingGuide />
+          <PurchaseWizard />
+        </section>
       </main>
       <Footer />
     </>
