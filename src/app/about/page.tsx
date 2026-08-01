@@ -11,19 +11,25 @@ import {
   getExploreLinks,
   getMissionSection,
   getValueCards,
+  getPageSeo,
 } from "@/lib/cms/adapters";
 
-export const metadata: Metadata = {
-  title: "About Us",
-  description:
-    "PNG Coffee's story, mission, and the roastery, training and equipment services behind every cup — PNG grown, shared with the world.",
-  openGraph: {
-    title: `About Us – ${site.name}`,
-    description:
-      "PNG Coffee's story, mission, and the roastery, training and equipment services behind every cup.",
-    images: [{ url: "/images/png.jpg", width: 1600, height: 1465 }],
-  },
-};
+const FALLBACK_DESCRIPTION =
+  "PNG Coffee's story, mission, and the roastery, training and equipment services behind every cup — PNG grown, shared with the world.";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = await getPageSeo("aboutUs");
+  const description = seo.seoDescription ?? FALLBACK_DESCRIPTION;
+  return {
+    title: seo.seoTitle ?? "About Us",
+    description,
+    openGraph: {
+      title: `${seo.seoTitle ?? "About Us"} – ${site.name}`,
+      description,
+      images: [{ url: "/images/png.jpg", width: 1600, height: 1465 }],
+    },
+  };
+}
 
 export default async function AboutPage() {
   const [storyIntro, exploreLinks, missionSection, valueCards] = await Promise.all([

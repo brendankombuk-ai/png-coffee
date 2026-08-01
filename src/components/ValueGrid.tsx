@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { valueCards as staticValueCards, type ValueCard } from "@/data/content";
@@ -63,11 +64,11 @@ const icons: Record<ValueCard["icon"], () => JSX.Element> = {
 function ValueCardItem({ card, index }: { card: ValueCard; index: number }) {
   const Icon = icons[card.icon];
   return (
-    <motion.a
-      href={card.href ?? `/about/${card.slug}`}
+    <motion.div
       variants={cardReveal}
       className="group block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ember-200"
     >
+    <Link href={card.href ?? `/${card.slug}`} className="block">
       <div
         className={`relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl transition-transform duration-500 group-hover:scale-[1.02]`}
       >
@@ -101,7 +102,8 @@ function ValueCardItem({ card, index }: { card: ValueCard; index: number }) {
           &#8212;&#8594;
         </span>
       </p>
-    </motion.a>
+    </Link>
+    </motion.div>
   );
 }
 
@@ -111,7 +113,7 @@ export default function ValueGrid({
   valueCards?: ValueCard[];
 } = {}) {
   return (
-    <section className="relative z-10 bg-void-950 px-4 py-20 sm:px-6 sm:py-28">
+    <section className="relative z-10 bg-void-950 px-4 pb-16 pt-10 sm:px-6 sm:pb-20 sm:pt-12">
       <motion.div
         variants={staggerContainer}
         initial="hidden"
