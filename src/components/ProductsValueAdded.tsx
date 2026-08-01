@@ -8,7 +8,7 @@ export default function ProductsValueAdded({
   titleAs?: "h1" | "h2";
 } = {}) {
   return (
-    <section className="relative z-10 mx-auto max-w-[1400px] px-6 pb-[100px] pt-[60px] sm:px-10">
+    <section className="relative z-10 mx-auto max-w-[1400px] px-6 pb-[100px] pt-8 sm:px-10">
       <TitleTag className="text-center font-display text-[38px] font-extrabold uppercase leading-[1.1] tracking-[1px] text-white sm:text-[48px] lg:text-[52px]">
         {productsValueAdded.title}
       </TitleTag>

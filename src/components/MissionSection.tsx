@@ -11,7 +11,7 @@ export default function MissionSection({
   return (
     <section
       id="mission"
-      className="relative z-10 bg-void-950 px-4 py-20 text-center sm:px-6 sm:py-28"
+      className="relative z-10 bg-void-950 px-4 py-10 text-center sm:px-6 sm:py-14"
     >
       <motion.div
         initial={{ opacity: 0, y: 20 }}
