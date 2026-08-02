@@ -15,6 +15,7 @@ export default function ProductsMarquee() {
   const tiles = [...IMAGES, ...IMAGES];
 
   return (
+    <>
     <div
       aria-hidden="true"
       className="relative overflow-hidden pb-2 pt-2 cursor-grab active:cursor-grabbing select-none"
@@ -52,5 +53,6 @@ export default function ProductsMarquee() {
     <p className="mt-3 mb-8 text-center text-[11px] font-medium uppercase tracking-[0.25em] text-white/35">
       Hold to pause · Release to resume
     </p>
+    </>
   );
 }
