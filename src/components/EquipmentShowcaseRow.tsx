@@ -29,7 +29,7 @@ export default function EquipmentShowcaseRow({
           <motion.div
             key={item.id}
             variants={fadeUp}
-            className="group flex flex-col items-center gap-3 rounded-xl border border-black/5 bg-black/[0.02] px-4 py-5 text-center transition-all duration-300 hover:-translate-y-1 hover:border-ember-500/30 hover:shadow-[0_16px_40px_-18px_rgba(232,52,28,0.45)]"
+            className="group flex flex-col items-center gap-3 rounded-xl border border-black/5 bg-black/[0.02] px-4 py-5 text-center transition-all duration-300 hover:scale-[1.12] hover:border-ember-500/30 hover:shadow-[0_20px_50px_-18px_rgba(232,52,28,0.5)] hover:z-10 relative"
           >
             <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-white">
               <Image
@@ -37,7 +37,7 @@ export default function EquipmentShowcaseRow({
                 alt={item.alt}
                 fill
                 sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 18vw"
-                className="object-contain p-3 transition-transform duration-500 group-hover:scale-[1.05]"
+                className="object-contain p-3 transition-transform duration-300 group-hover:scale-[1.1]"
                 loading="lazy"
               />
             </div>

@@ -56,12 +56,17 @@ module.exports = {
           "50%": { transform: "scale(1.09) translate3d(-1.4%, -1%, 0)" },
           "100%": { transform: "scale(1.14) translate3d(1%, 0.6%, 0)" },
         },
+        marquee: {
+          "0%": { transform: "translateX(0%)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
       },
       animation: {
         floaty: "floaty 6s ease-in-out infinite",
         "slow-zoom": "slow-zoom 24s ease-in-out infinite alternate",
         twinkle: "twinkle 3s ease-in-out infinite",
         "ken-burns": "ken-burns 32s ease-in-out infinite alternate",
+        marquee: "marquee 22s linear infinite",
       },
     },
   },

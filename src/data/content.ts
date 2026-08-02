@@ -13,8 +13,8 @@ export const hero = {
   eyebrow: "Small batch \u00b7 Papua New Guinea",
   headline: "Welcome to PNG Coffee.",
   body: [
-    "We specialise in producing high-quality roasted coffee beans. From roasting and sorting to packaging, every step is meticulously handled to deliver the freshest coffee straight to you.",
-    "Experience the rich, full-bodied flavours of our coffee, crafted with passion and care.",
+    "We specialise in producing high-quality, small-batch roasted coffee beans. From roasting and sorting to packaging, every step is carefully managed to bring you the freshest coffee possible.",
+    "Experience the rich, full-bodied flavors of our coffee-crafted with passion and care.",
   ],
   cta: "Explore Our Coffee",
 };
@@ -249,32 +249,32 @@ export const coffeeShowroom = {
 export const roasteryEquipment: EquipmentItem[] = [
   {
     id: "de-stoner",
-    label: "De-Stoner",
-    alt: "Coffee bean de-stoning machine",
+    label: "Destoner Machine",
+    alt: "Destoner machine for removing stones from coffee beans",
     image: "/images/about-values/gallery/de-stoner.png",
   },
   {
     id: "bagging-filling",
-    label: "Bagging & Filling",
-    alt: "Automated coffee bagging and filling machine with touchscreen",
+    label: "Color Sorter",
+    alt: "Color sorter machine for sorting coffee beans by colour",
     image: "/images/about-values/gallery/bagging-filling.png",
   },
   {
     id: "roaster",
-    label: "Roaster",
-    alt: "Tall stainless coffee roasting and packaging tower",
+    label: "Roller Grinder",
+    alt: "Roller grinder machine for grinding coffee beans",
     image: "/images/about-values/gallery/roaster.png",
   },
   {
     id: "weighing-filling",
-    label: "Weighing & Filling",
-    alt: "Coffee weighing and filling unit with control panel",
+    label: "Coffee Ground/Bean Filler Automatic Machine",
+    alt: "Automatic coffee ground and bean filler machine",
     image: "/images/about-values/gallery/weighing-filling.png",
   },
   {
     id: "sealing-line",
-    label: "Sealing Line",
-    alt: "Continuous coffee bag sealing conveyor line with green belt",
+    label: "Automatic Sealer Machine",
+    alt: "Automatic sealer machine for sealing coffee bags",
     image: "/images/about-values/gallery/sealing-line.png",
   },
 ];

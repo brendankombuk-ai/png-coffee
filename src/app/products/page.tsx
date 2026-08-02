@@ -5,6 +5,7 @@ import ProductsHero from "@/components/ProductsHero";
 import PurchaseWizard from "@/components/PurchaseWizard";
 import ShoppingGuide from "@/components/ShoppingGuide";
 import ProductsValueAdded from "@/components/ProductsValueAdded";
+import ProductsMarquee from "@/components/ProductsMarquee";
 import Footer from "@/components/Footer";
 import { site } from "@/data/content";
 import { getProductsHero, getProductsValueAdded, getPageSeo } from "@/lib/cms/adapters";
@@ -40,10 +41,11 @@ export default async function ProductsPage() {
         <section aria-label="Our Products">
           <ProductsHero productsHero={productsHero} />
           <ProductsValueAdded productsValueAdded={productsValueAdded} />
+          <ProductsMarquee />
         </section>
 
         {/* ── Section divider ── */}
-        <div className="relative z-10 mx-auto max-w-[900px] px-6 sm:px-10">
+        <div className="relative z-10 mx-auto max-w-[900px] px-6 sm:px-10 mt-16 sm:mt-24">
           <div className="flex items-center gap-4 py-4">
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-ember-500/40 to-ember-500/40" />
             <span className="shrink-0 font-display text-[11px] font-bold uppercase tracking-[0.35em] text-ember-400">
