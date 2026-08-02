@@ -17,7 +17,7 @@ export default function ProductsMarquee() {
   return (
     <div
       aria-hidden="true"
-      className="relative overflow-hidden pb-8 pt-2 cursor-grab active:cursor-grabbing select-none"
+      className="relative overflow-hidden pb-2 pt-2 cursor-grab active:cursor-grabbing select-none"
       onMouseDown={() => setPaused(true)}
       onMouseUp={() => setPaused(false)}
       onMouseLeave={() => setPaused(false)}
@@ -48,5 +48,9 @@ export default function ProductsMarquee() {
         ))}
       </div>
     </div>
+
+    <p className="mt-3 mb-8 text-center text-[11px] font-medium uppercase tracking-[0.25em] text-white/35">
+      Hold to pause · Release to resume
+    </p>
   );
 }
