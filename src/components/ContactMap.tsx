@@ -1,42 +1,72 @@
-export default function ContactMap({ embedUrl }: { embedUrl: string }) {
+"use client";
+
+import { useEffect, useRef } from "react";
+
+const LAT = -9.4552808;
+const LNG = 147.1922892;
+
+export default function ContactMap() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    let map: import("leaflet").Map | null = null;
+
+    (async () => {
+      const L = (await import("leaflet")).default;
+      await import("leaflet/dist/leaflet.css" as never);
+
+      if (!containerRef.current) return;
+
+      map = L.map(containerRef.current, { zoomControl: true }).setView([LAT, LNG], 16);
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19,
+      }).addTo(map);
+
+      const icon = L.icon({
+        iconUrl: "/images/map-pin.png",
+        iconSize: [48, 48],
+        iconAnchor: [24, 48],
+        tooltipAnchor: [0, -52],
+      });
+
+      const marker = L.marker([LAT, LNG], { icon }).addTo(map);
+
+      marker.bindTooltip(
+        `<div style="text-align:center;line-height:1.4">
+          <strong style="font-size:13px;color:#111">SwissXpresso (PNG) Ltd</strong><br/>
+          <span style="font-size:11px;color:#555">PNG Coffee &middot; Gabaka St, Gordon, Port Moresby</span>
+        </div>`,
+        { permanent: true, direction: "top", className: "png-map-tooltip" }
+      );
+    })();
+
+    return () => {
+      map?.remove();
+    };
+  }, []);
+
   return (
     <section className="relative z-10 mx-auto max-w-6xl px-6 pb-24 pt-16 sm:px-10">
-      <div className="relative overflow-hidden rounded-2xl border border-white/10">
-        <iframe
-          src={embedUrl}
-          title="PNG Coffee location map"
-          width="100%"
-          height="420"
-          style={{ border: 0, display: "block" }}
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-        />
-
-        {/* Company name label positioned over the map pin */}
-        <div
-          className="pointer-events-none absolute"
-          style={{ left: "50%", top: "50%", transform: "translate(-50%, calc(-100% - 16px))" }}
-        >
-          <div className="relative rounded-lg bg-white px-3 py-2 text-center shadow-lg">
-            <p className="whitespace-nowrap text-[13px] font-bold text-gray-900">
-              SwissXpresso (PNG) Ltd
-            </p>
-            <p className="whitespace-nowrap text-[11px] text-gray-500">
-              PNG Coffee · Gabaka St, Gordon, Port Moresby
-            </p>
-            {/* Pointer triangle */}
-            <span
-              className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full"
-              style={{
-                width: 0,
-                height: 0,
-                borderLeft: "6px solid transparent",
-                borderRight: "6px solid transparent",
-                borderTop: "7px solid white",
-              }}
-            />
-          </div>
-        </div>
+      <style>{`
+        .png-map-tooltip {
+          background: white;
+          border: none;
+          border-radius: 8px;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+          padding: 6px 12px;
+          white-space: nowrap;
+        }
+        .png-map-tooltip::before {
+          border-top-color: white;
+        }
+      `}</style>
+      <div className="overflow-hidden rounded-2xl border border-white/10">
+        <div ref={containerRef} style={{ width: "100%", height: "420px" }} />
       </div>
     </section>
   );
