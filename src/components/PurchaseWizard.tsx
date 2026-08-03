@@ -233,9 +233,6 @@ export default function PurchaseWizard() {
                       <p className="font-display text-sm font-extrabold uppercase tracking-wide text-white">
                         {p.name}
                       </p>
-                      <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-widest text-ember-300">
-                        {p.roast} · {p.grind}
-                      </p>
                       <p className="mt-1 text-xs leading-snug text-white/55 line-clamp-2">
                         {p.description}
                       </p>

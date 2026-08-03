@@ -231,6 +231,7 @@ export const roasteryHero = {
   paragraphs: [
     "Located at Gabaka Street, Gordon, Port Moresby, our state-of-the-art roastery allows us to provide fresher and higher-quality coffee to our corporate customers.",
     "Here, we craft custom blends and micro-lots of single-origin beans, ensuring a unique and personalised coffee experience.",
+    "We are probably the only Roastery in PNG who has and uses the most advanced and sophisticated equipment; de-stoners & colour sorting for the perfect roast for each and every batch producing consistent quality.",
   ],
 };
 

@@ -1,11 +1,12 @@
 "use client";
 
+import React from "react";
 import { motion } from "framer-motion";
 import { ChevronRight, MapPin, Coffee, Package, ShoppingCart, CheckCircle } from "lucide-react";
 
-const STEPS = [
+const STEPS: { n: number; Icon: React.ElementType; label: string; note: string | string[] }[] = [
   { n: 1, Icon: MapPin,       label: "Select your zone",        note: "Sets your shipping price" },
-  { n: 2, Icon: Coffee,       label: "Choose coffee type",      note: "Dark or Medium roast" },
+  { n: 2, Icon: Coffee,       label: "Choose Coffee Type",      note: ["Dark or Medium roast", "Beans or Ground"] },
   { n: 3, Icon: Package,      label: "Pick your bundle",        note: "3, 6 or 10-pack" },
   { n: 4, Icon: ShoppingCart, label: "Proceed to checkout",     note: "Review & pay securely" },
   { n: 5, Icon: CheckCircle,  label: "Order confirmed",         note: "We'll ship straight to you" },
@@ -39,7 +40,11 @@ export default function ShoppingGuide() {
                   Step {n}
                 </span>
                 <p className="text-xs font-semibold leading-snug text-white/85">{label}</p>
-                <p className="text-[10px] leading-snug text-white/40">{note}</p>
+                <p className="text-[10px] leading-snug text-white/40">
+                  {Array.isArray(note)
+                    ? note.map((line, i) => <React.Fragment key={i}>{line}{i < note.length - 1 && <br />}</React.Fragment>)
+                    : note}
+                </p>
               </div>
 
               {/* Arrow connector — only between steps, hidden on mobile */}
