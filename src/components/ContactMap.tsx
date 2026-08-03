@@ -1,66 +1,42 @@
-"use client";
-
-import { useEffect, useRef } from "react";
-
-const LAT = -9.4552808;
-const LNG = 147.1922892;
-
-declare global {
-  interface Window {
-    _initPNGCoffeeMap?: () => void;
-  }
-}
-
-export default function ContactMap() {
-  const mapRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function initMap() {
-      if (!mapRef.current || !window.google?.maps) return;
-
-      const map = new window.google.maps.Map(mapRef.current, {
-        center: { lat: LAT, lng: LNG },
-        zoom: 16,
-      });
-
-      const marker = new window.google.maps.Marker({
-        position: { lat: LAT, lng: LNG },
-        map,
-        title: "We Are Located Here",
-        icon: {
-          url: "/images/map-pin.png",
-          scaledSize: new window.google.maps.Size(48, 48),
-          anchor: new window.google.maps.Point(24, 48),
-          labelOrigin: new window.google.maps.Point(24, -8),
-        },
-      });
-
-    }
-
-    if (window.google?.maps) {
-      initMap();
-      return;
-    }
-
-    window._initPNGCoffeeMap = initMap;
-
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
-    const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=_initPNGCoffeeMap`;
-    script.async = true;
-    script.defer = true;
-    document.head.appendChild(script);
-
-    return () => {
-      script.remove();
-      delete window._initPNGCoffeeMap;
-    };
-  }, []);
-
+export default function ContactMap({ embedUrl }: { embedUrl: string }) {
   return (
     <section className="relative z-10 mx-auto max-w-6xl px-6 pb-24 pt-16 sm:px-10">
-      <div className="overflow-hidden rounded-2xl border border-white/10">
-        <div ref={mapRef} style={{ width: "100%", height: "420px" }} />
+      <div className="relative overflow-hidden rounded-2xl border border-white/10">
+        <iframe
+          src={embedUrl}
+          title="PNG Coffee location map"
+          width="100%"
+          height="420"
+          style={{ border: 0, display: "block" }}
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+        />
+
+        {/* Company name label positioned over the map pin */}
+        <div
+          className="pointer-events-none absolute"
+          style={{ left: "50%", top: "50%", transform: "translate(-50%, calc(-100% - 16px))" }}
+        >
+          <div className="relative rounded-lg bg-white px-3 py-2 text-center shadow-lg">
+            <p className="whitespace-nowrap text-[13px] font-bold text-gray-900">
+              SwissXpresso (PNG) Ltd
+            </p>
+            <p className="whitespace-nowrap text-[11px] text-gray-500">
+              PNG Coffee · Gabaka St, Gordon, Port Moresby
+            </p>
+            {/* Pointer triangle */}
+            <span
+              className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full"
+              style={{
+                width: 0,
+                height: 0,
+                borderLeft: "6px solid transparent",
+                borderRight: "6px solid transparent",
+                borderTop: "7px solid white",
+              }}
+            />
+          </div>
+        </div>
       </div>
     </section>
   );

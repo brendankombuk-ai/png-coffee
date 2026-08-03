@@ -38,7 +38,7 @@ export default async function ContactPage() {
           </div>
         </section>
 
-        <ContactMap />
+        <ContactMap embedUrl={data.mapEmbedUrl} />
       </main>
       <Footer />
     </>
