@@ -17,4 +17,8 @@ if (!secretKey && process.env.NODE_ENV !== "test") {
 export const stripe = new Stripe(secretKey || "sk_test_not_configured", {
   apiVersion: "2026-06-24.dahlia",
   typescript: true,
+  // Cloudflare Workers has no Node HTTP stack, so Stripe's default Node client
+  // won't run there. The fetch-based client works on both Workers and Node,
+  // so this is also safe for local `next dev`.
+  httpClient: Stripe.createFetchHttpClient(),
 });

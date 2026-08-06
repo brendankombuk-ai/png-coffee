@@ -7,3 +7,12 @@ out
 next-env.d.ts
 *.tsbuildinfo
 /tsconfig.tsbuildinfo
+
+# Cloudflare / OpenNext
+.open-next
+.wrangler
+.dev.vars
+cloudflare-env.d.ts
+
+# Vercel (no longer the host — safe to delete the .vercel folder too)
+.vercel

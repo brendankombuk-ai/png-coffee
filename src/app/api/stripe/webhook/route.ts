@@ -1,3 +1,4 @@
+import Stripe from "stripe";
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe/client";
 
@@ -30,7 +31,17 @@ export async function POST(req: NextRequest) {
 
   let event;
   try {
-    event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
+    // Cloudflare Workers verify signatures with async Web Crypto (SubtleCrypto).
+    // The synchronous constructEvent() relies on Node's crypto and throws on
+    // the Workers runtime, so we use the async variant plus a SubtleCrypto
+    // provider. Verification behaviour is otherwise identical.
+    event = await stripe.webhooks.constructEventAsync(
+      rawBody,
+      signature,
+      webhookSecret,
+      undefined,
+      Stripe.createSubtleCryptoProvider()
+    );
   } catch (err) {
     console.error("[stripe webhook] Signature verification failed:", err);
     return NextResponse.json({ error: "Invalid signature." }, { status: 400 });

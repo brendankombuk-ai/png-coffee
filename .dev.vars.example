@@ -1,0 +1,21 @@
+# =============================================================================
+# Local secrets for `npm run preview` (Workers runtime, via Wrangler).
+# Copy this to .dev.vars and fill in real values. .dev.vars is gitignored.
+#
+# NOTE: this is only for previewing the Worker build locally. For normal
+# `next dev` you still use .env.local as before. On Cloudflare itself these
+# server secrets are set with `wrangler secret put ...` (see CLOUDFLARE_MIGRATION.md).
+# =============================================================================
+
+# --- Server-only secrets (runtime) ---
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+SANITY_API_TOKEN=
+SANITY_WEBHOOK_SECRET=change-me
+
+# --- Public / build-time vars (also needed for the Worker build) ---
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key_here
+NEXT_PUBLIC_SANITY_PROJECT_ID=your_project_id_here
+NEXT_PUBLIC_SANITY_DATASET=production
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+NEXT_PUBLIC_CURRENCY=USD

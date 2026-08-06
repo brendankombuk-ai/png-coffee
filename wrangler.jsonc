@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "png-coffee",
+  "main": ".open-next/worker.js",
+  // nodejs_compat is required by the OpenNext adapter; the compatibility date
+  // must be recent enough that process.env is populated automatically.
+  "compatibility_date": "2026-08-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  }
+
+  // OPTIONAL — R2 incremental cache for cross-edge ISR (see open-next.config.ts
+  // and CLOUDFLARE_MIGRATION.md). After `wrangler r2 bucket create png-coffee-cache`,
+  // uncomment:
+  //
+  // ,"r2_buckets": [
+  //   { "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "png-coffee-cache" }
+  // ]
+}
