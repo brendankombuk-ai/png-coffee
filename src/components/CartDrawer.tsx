@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
@@ -9,52 +9,12 @@ import { useZone } from "@/lib/zone/ZoneContext";
 import { formatPrice } from "@/lib/cart/currency";
 import { bundlePrice, getZone } from "@/lib/shipping/zones";
 import ZoneSelector from "./ZoneSelector";
+import PayPalCheckout from "./PayPalCheckout";
 
 export default function CartDrawer() {
   const { items, itemCount, bagCount, quote, isOpen, closeCart, removeItem, setQuantity } = useCart();
   const { zone } = useZone();
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
-  const [checkoutError, setCheckoutError] = useState<string | null>(null);
-
-  // When the customer returns from Stripe via the browser's Back button, the
-  // page is restored from the bfcache with our React state frozen — which left
-  // the Checkout button stuck on "Redirecting…" and disabled. Reset it on the
-  // bfcache-restore (pageshow) event so the cart is usable again.
-  useEffect(() => {
-    const onPageShow = (e: PageTransitionEvent) => {
-      if (e.persisted) {
-        setIsCheckingOut(false);
-        setCheckoutError(null);
-      }
-    };
-    window.addEventListener("pageshow", onPageShow);
-    return () => window.removeEventListener("pageshow", onPageShow);
-  }, []);
-
-  async function handleCheckout() {
-    if (!zone) {
-      setCheckoutError("Please choose your shipping destination first.");
-      return;
-    }
-    setCheckoutError(null);
-    setIsCheckingOut(true);
-    try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          zone,
-          items: items.map((i) => ({ productId: i.productId, size: i.size, quantity: i.quantity })),
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.url) throw new Error(data.error || "Could not start checkout. Please try again.");
-      window.location.href = data.url;
-    } catch (err) {
-      setCheckoutError(err instanceof Error ? err.message : "Something went wrong.");
-      setIsCheckingOut(false);
-    }
-  }
+  const [note, setNote] = useState("");
 
   return (
     <AnimatePresence>
@@ -160,15 +120,32 @@ export default function CartDrawer() {
                       : "Choose your zone to see pricing (postage is included in the price)."}
                   </p>
 
-                  {checkoutError && <p className="mt-3 text-xs text-ember-300">{checkoutError}</p>}
+                  {/* Optional order note — passed onto the PayPal order */}
+                  <div className="mt-4">
+                    <label
+                      htmlFor="order-note"
+                      className="mb-1.5 block text-xs font-medium text-white/55"
+                    >
+                      Add a message about your order (optional)
+                    </label>
+                    <textarea
+                      id="order-note"
+                      value={note}
+                      onChange={(e) => setNote(e.target.value)}
+                      rows={2}
+                      maxLength={127}
+                      placeholder="Delivery notes, gift message…"
+                      className="w-full resize-none rounded-lg border border-white/12 bg-white/[0.04] px-3 py-2 text-sm text-white/90 placeholder:text-white/30 focus:border-ember-400/60 focus:outline-none"
+                    />
+                  </div>
 
-                  <button
-                    onClick={handleCheckout}
-                    disabled={isCheckingOut || !zone}
-                    className="mt-4 w-full rounded-full bg-ember-500 py-3 text-center text-sm font-bold uppercase tracking-widest text-white transition-colors hover:bg-ember-400 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {isCheckingOut ? "Redirecting to checkout…" : "Checkout"}
-                  </button>
+                  {zone ? (
+                    <PayPalCheckout zone={zone} items={items} note={note} />
+                  ) : (
+                    <p className="mt-4 rounded-full border border-white/12 bg-white/[0.03] py-3 text-center text-xs font-medium uppercase tracking-widest text-white/50">
+                      Choose your zone above to pay
+                    </p>
+                  )}
                 </div>
               </>
             )}

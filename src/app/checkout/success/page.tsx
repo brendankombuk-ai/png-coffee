@@ -12,8 +12,8 @@ export default function CheckoutSuccessPage() {
   const [cleared, setCleared] = useState(false);
 
   useEffect(() => {
-    // Clear the cart once the customer has actually reached Stripe's
-    // success redirect — i.e. payment genuinely went through.
+    // Clear the cart once the customer has actually reached PayPal’s
+    // success redirect — i.e. payment genuinely went through (PayPal capture).
     clearCart();
     setCleared(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
