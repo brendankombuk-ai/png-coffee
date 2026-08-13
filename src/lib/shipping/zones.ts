@@ -98,12 +98,16 @@ export type CoffeeProduct = {
   description: string;
   image: string;
   alt: string;
+  /** GTIN-13 barcode for a single 250g bag of this product (client-supplied). */
+  gtin: string;
   /** Per-bundle SKU + stock. (Price comes from the shared zone grid above.) */
   bundles: Record<BundleSize, { sku: string; stock: number }>;
   featured?: boolean;
 };
 
-// ⚠️ SKUs/stock are placeholders — replace with real values.
+// GTINs are real (client-supplied barcodes, one per 250g bag).
+// ⚠️ Bundle SKUs are internal codes (fine to keep) — stock counts are still
+// a placeholder (100 each) until real inventory numbers come in.
 export const PRODUCTS: CoffeeProduct[] = [
   {
     id: "dark-roast-beans",
@@ -113,6 +117,7 @@ export const PRODUCTS: CoffeeProduct[] = [
     description: "Rich, bold dark roast whole beans from the PNG highlands. Packed in 250g bags.",
     image: "/images/products/coffee/dark-roast-beans.jpg",
     alt: "PNG Coffee Dark Roast whole beans 250g bag",
+    gtin: "9349129000036",
     bundles: { 3: { sku: "DRB-3", stock: 100 }, 6: { sku: "DRB-6", stock: 100 }, 10: { sku: "DRB-10", stock: 100 } },
     featured: true,
   },
@@ -124,6 +129,7 @@ export const PRODUCTS: CoffeeProduct[] = [
     description: "Rich, bold dark roast, freshly ground. Packed in 250g bags.",
     image: "/images/products/coffee/dark-roast-ground.jpg",
     alt: "PNG Coffee Dark Roast ground 250g bag",
+    gtin: "9349129000029",
     bundles: { 3: { sku: "DRG-3", stock: 100 }, 6: { sku: "DRG-6", stock: 100 }, 10: { sku: "DRG-10", stock: 100 } },
   },
   {
@@ -134,6 +140,7 @@ export const PRODUCTS: CoffeeProduct[] = [
     description: "Smooth, balanced medium roast whole beans. Packed in 250g bags.",
     image: "/images/products/coffee/medium-roast-beans.jpg",
     alt: "PNG Coffee Medium Roast whole beans 250g bag",
+    gtin: "9349129000012",
     bundles: { 3: { sku: "MRB-3", stock: 100 }, 6: { sku: "MRB-6", stock: 100 }, 10: { sku: "MRB-10", stock: 100 } },
   },
   {
@@ -144,6 +151,7 @@ export const PRODUCTS: CoffeeProduct[] = [
     description: "Smooth, balanced medium roast, freshly ground. Packed in 250g bags.",
     image: "/images/products/coffee/medium-roast-ground.jpg",
     alt: "PNG Coffee Medium Roast ground 250g bag",
+    gtin: "9349129000005",
     bundles: { 3: { sku: "MRG-3", stock: 100 }, 6: { sku: "MRG-6", stock: 100 }, 10: { sku: "MRG-10", stock: 100 } },
   },
 ];

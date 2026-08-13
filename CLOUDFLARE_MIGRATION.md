@@ -83,18 +83,22 @@ Two buckets, because `NEXT_PUBLIC_*` values are baked in **at build time**, whil
 server keys are read **at runtime**:
 
 **Build-time vars** (set in the Workers Builds environment / project settings — these
-are needed while the build runs):
+are needed while the build runs, because `NEXT_PUBLIC_*` values get baked into the
+JS bundle at build time, not read at runtime):
 - `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`
 - `NEXT_PUBLIC_SANITY_PROJECT_ID`
 - `NEXT_PUBLIC_SANITY_DATASET`
-- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
+- `NEXT_PUBLIC_PAYPAL_CLIENT_ID` — same value as `PAYPAL_CLIENT_ID` below; the
+  PayPal Buttons component reads this one client-side.
 - `NEXT_PUBLIC_CURRENCY`
 - `SANITY_API_TOKEN` (if your build queries Sanity for static pages)
 
 **Runtime secrets** (Worker → Settings → **Variables and Secrets**, added as *Secret*,
 or via `npx wrangler secret put NAME`):
-- `STRIPE_SECRET_KEY`
-- `STRIPE_WEBHOOK_SECRET`
+- `PAYPAL_CLIENT_ID`
+- `PAYPAL_CLIENT_SECRET`
+- `PAYPAL_ENV` — `sandbox` while testing, `live` only after a full sandbox
+  purchase has been verified end to end.
 - `SANITY_API_TOKEN`
 - `SANITY_WEBHOOK_SECRET`
 
@@ -105,9 +109,9 @@ Let the first build run and deploy to the free `*.workers.dev` URL **before** yo
 point your domain. Then test:
 - Homepage + a product page load, images from `cdn.sanity.io` render.
 - `/studio` loads (Sanity Studio).
-- **A full test-mode Stripe checkout** end to end.
-- The **Stripe webhook** fires and verifies (check the Worker logs for the
-  "Payment received" line, or a Stripe test event).
+- **A full sandbox-mode PayPal checkout** end to end (Buy Now → PayPal
+  sandbox login → order confirmation page).
+- Order creation and capture routes both return success in the Worker logs.
 
 ### D. Custom domain
 1. Worker → **Settings** → **Domains & Routes** → **Add** → Custom Domain.
