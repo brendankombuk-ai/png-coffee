@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Menu, Search, ShoppingBag, X } from "lucide-react";
+import { Menu, ShoppingBag, X } from "lucide-react";
 import { nav } from "@/data/content";
 import { useCart } from "@/lib/cart/CartContext";
+import NavSearch from "@/components/NavSearch";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -58,12 +59,7 @@ export default function Navbar() {
           </ul>
 
           <div className="hidden items-center gap-4 md:flex">
-            <button
-              aria-label="Search products"
-              className="text-white/85 transition-colors hover:text-ember-300"
-            >
-              <Search size={18} strokeWidth={1.75} />
-            </button>
+            <NavSearch />
             <button
               aria-label={`View cart${itemCount > 0 ? ` (${itemCount} items)` : ""}`}
               onClick={openCart}
@@ -107,9 +103,7 @@ export default function Navbar() {
               </li>
             ))}
             <li className="mt-1 flex items-center gap-5 px-3 py-1.5">
-              <button aria-label="Search products" className="text-white/85">
-                <Search size={18} strokeWidth={1.75} />
-              </button>
+              <NavSearch variant="mobile" className="text-white/85 transition-colors hover:text-ember-300" />
               <button
                 aria-label={`View cart${itemCount > 0 ? ` (${itemCount} items)` : ""}`}
                 onClick={() => {
