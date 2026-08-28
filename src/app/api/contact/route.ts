@@ -1,15 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Resend } from "resend";
 
-/**
- * Handles Contact page form submissions.
- *
- * Right now this only validates the input and logs it server-side — there's
- * no email delivery or CMS storage wired up yet (that needs either the
- * Strapi CMS's email plugin triggered via its API, or a direct email
- * service call here, e.g. Nodemailer/Resend). This is deliberately built as
- * the single place that logic would plug into later, same pattern as the
- * Stripe webhook handler.
- */
+const resend = new Resend(process.env.RESEND_API_KEY);
+const TO_EMAIL = "moe.swissxpressopng29@gmail.com";
 
 type ContactPayload = {
   name?: string;
@@ -45,17 +38,29 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
   }
 
-  // TODO: send this via email (Strapi's configured email plugin, or a
-  // direct provider call here) and/or store it as a submission in Strapi.
-  console.log("[contact] New submission:", {
-    name,
-    company: company || null,
-    phone: phone || null,
-    email,
-    subject,
-    message,
-    receivedAt: new Date().toISOString(),
+  const { error } = await resend.emails.send({
+    from: "PNG Coffee Contact <onboarding@resend.dev>",
+    to: TO_EMAIL,
+    replyTo: email,
+    subject: `[Contact] ${subject}`,
+    html: `
+      <h2>New contact form submission</h2>
+      <table cellpadding="6" style="border-collapse:collapse">
+        <tr><td><strong>Name</strong></td><td>${name}</td></tr>
+        ${company ? `<tr><td><strong>Company</strong></td><td>${company}</td></tr>` : ""}
+        ${phone ? `<tr><td><strong>Phone</strong></td><td>${phone}</td></tr>` : ""}
+        <tr><td><strong>Email</strong></td><td><a href="mailto:${email}">${email}</a></td></tr>
+        <tr><td><strong>Subject</strong></td><td>${subject}</td></tr>
+      </table>
+      <h3>Message</h3>
+      <p style="white-space:pre-wrap">${message}</p>
+    `,
   });
+
+  if (error) {
+    console.error("[contact] Resend error:", error);
+    return NextResponse.json({ error: "Failed to send message. Please try again." }, { status: 500 });
+  }
 
   return NextResponse.json({ success: true });
 }
