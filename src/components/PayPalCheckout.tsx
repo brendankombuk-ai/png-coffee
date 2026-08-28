@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import { PayPalScriptProvider, PayPalButtons, FUNDING } from "@paypal/react-paypal-js";
 import type { ZoneId } from "@/lib/shipping/zones";
 import type { CartItem } from "@/lib/cart/types";
 
@@ -33,9 +33,16 @@ export default function PayPalCheckout({ zone, items, note, onSuccess }: Props) 
   return (
     <div className="mt-4">
       <PayPalScriptProvider
-        options={{ clientId: CLIENT_ID, currency: "USD", intent: "capture" }}
+        options={{
+          clientId: CLIENT_ID,
+          currency: "USD",
+          intent: "capture",
+          // Only PayPal is offered here — hide the card / other funding buttons.
+          disableFunding: "card",
+        }}
       >
         <PayPalButtons
+          fundingSource={FUNDING.PAYPAL}
           style={{ layout: "vertical", color: "gold", shape: "pill", label: "paypal" }}
           createOrder={async () => {
             setError(null);
