@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 const TO_EMAIL = "moe.swissxpressopng29@gmail.com";
 
 type ContactPayload = {
@@ -37,6 +36,19 @@ export async function POST(req: NextRequest) {
   if (!isValidEmail(email)) {
     return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
   }
+
+  // Instantiate here, not at module scope: the key is a runtime secret and is
+  // absent during `next build`, where the Resend constructor would otherwise
+  // throw while collecting page data.
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.error("[contact] RESEND_API_KEY is not set.");
+    return NextResponse.json(
+      { error: "Messaging isn’t configured yet. Please try again later." },
+      { status: 503 }
+    );
+  }
+  const resend = new Resend(apiKey);
 
   const { error } = await resend.emails.send({
     from: "PNG Coffee Contact <onboarding@resend.dev>",
